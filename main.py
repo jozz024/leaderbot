@@ -19,6 +19,8 @@ async def on_ready():
 RULSET_NAME_TO_ID_MAPPING = {
     "vanilla": "44748ebb-e2f3-4157-90ec-029e26087ad0",
     "spirits": "328d8932-456f-4219-9fa4-c4bafdb55776",
+    "v": "44748ebb-e2f3-4157-90ec-029e26087ad0",
+    "s": "328d8932-456f-4219-9fa4-c4bafdb55776",
 }
 
 CHARACTER_NAME_TO_ID_MAPPING = {
@@ -94,11 +96,8 @@ CHARACTER_NAME_TO_ID_MAPPING = {
     "hero": "da0c84d7-9c43-4e74-92e7-113194694b25",
     "luigi": "da7df432-47e4-4cbe-9b29-1c7958197105",
     "rosalina & luma": "e2531ffe-e834-49ae-b233-56386472a6ed",
-    "rosalina": "e2531ffe-e834-49ae-b233-56386472a6ed",
     "mii swordfighter": "e3891498-94f6-4ccc-a527-c5f4e26051d1",
-    "mii sword": "e3891498-94f6-4ccc-a527-c5f4e26051d1",
     "wii fit trainer": "e6f9ab43-8434-48bb-a765-ebbb97f66fae",
-    "wii fit": "e6f9ab43-8434-48bb-a765-ebbb97f66fae",
     "joker": "e7d9e195-f86e-4ac8-8bd2-7302889147eb",
     "lucario": "e9128698-7812-4636-9074-127f1983bf1b",
     "toon link": "eea3bb5b-564a-46c4-9c4c-8cef6e59c8b1",
@@ -106,7 +105,49 @@ CHARACTER_NAME_TO_ID_MAPPING = {
     "simon": "fa1ac3ba-0880-483b-b94e-9b4952e3f999",
     "mewtwo": "fd264bc3-a141-400f-9e55-adabc783322d",
     "banjo & kazooie": "fe995f08-d261-47ba-ac69-81bbd272f8ce",
-    "banjo": "fe995f08-d261-47ba-ac69-81bbd272f8ce",
+}
+
+TRANSLATION_TABLE = {
+    "palu": "palutena",
+    "drmario": "dr. mario",
+    "incin": "incineroar",
+    "bowserjr": "koopaling",
+    "plant": "piranha plant",
+    "mk": "meta knight",
+    "icies": "ice climbers",
+    "mac": "little mac",
+    "ganon": "ganondorf",
+    "pacman": "pac-man",
+    "pac": "pac-man",
+    "bayo": "bayonetta",
+    "mm": "mega man",
+    "mega": "mega man",
+    "r.o.b.": "rob",
+    "dsamus": "dark samus",
+    "pt": "pokemon trainer",
+    "gunner": "mii gunner",
+    "dh": "duck hunt",
+    "puff": "jigglypuff",
+    "zss": "zero suit samus",
+    "dpit": "dark pit",
+    "krool": "king krool",
+    "brawler": "mii brawler",
+    "gameandwatch": "game & watch",
+    "g&w": "game & watch",
+    "dk": "donkey kong",
+    "falcon": "captain falcon",
+    "dedede": "king dedede",
+    "d3": "king dedede",
+    "yink": "young link",
+    "rosa": "rosalina & luma",
+    "rosalina": "rosalina & luma",
+    "miisword": "mii swordfighter",
+    "sword": "mii swordfighter",
+    "wft": "wii fit trainer",
+    "wiifit": "wii fit trainer",
+    "tink": "toon link",
+    "banjo": "banjo & kazooie"
+    "banjoandkazooie": "banjo & kazooie"
 }
 
 
@@ -135,17 +176,32 @@ async def gettopthreenfp(ctx, ruleset):
 
 @bot.command(name="top3char")
 async def gettopthreenfpcharacter(ctx, ruleset, *, character_name):
-  try:
-    character = CHARACTER_NAME_TO_ID_MAPPING[character_name.lower()]
-    rulesetid = RULSET_NAME_TO_ID_MAPPING[ruleset.lower()]
+    try:
+        character = CHARACTER_NAME_TO_ID_MAPPING[character_name.lower()]
+    except KeyError:
+        try:
+            character = CHARACTER_NAME_TO_ID_MAPPING[TRANSLATION_TABLE[character_name.lower().replace(" ", "")]]
+        except KeyError:
+            await ctx.send(f"'{character_name}' is an invalid character.")
+    try:
+        rulesetid = RULSET_NAME_TO_ID_MAPPING[ruleset.lower()]
+    except KeyError:
+        await ctx.send(f"'{ruleset}' is an invalid ruleset.")
+
     characterlink = requests.get(
         f"https://www.amiibots.com/api/amiibo?per_page=3&ruleset_id={rulesetid}&playable_character_id={character}"
     )
-    await ctx.send(
-        f"The highest rated {ruleset} {character_name} are: \n 1.) {characterlink.json()['data'][0]['name']} [{round(characterlink.json()['data'][0]['rating'], 2)}] \n 2.) {characterlink.json()['data'][1]['name']} [{round(characterlink.json()['data'][1]['rating'], 2)}] \n 3.) {characterlink.json()['data'][2]['name']} [{round(characterlink.json()['data'][2]['rating'], 2)}]"
-    )
-  except KeyError:
-    await ctx.send('Invalid argument specified.')
+
+    output = f"The highest rated {ruleset} {character.title()} are:"
+
+    for i in range(0, 3):
+        try:
+            output += f"\n {i}.) {characterlink.json()['data'][i]['name']} [{round(characterlink.json()['data'][i]['rating'], 2)}]"
+        except IndexError:
+            output += f"\n {i}.) No more characters"
+
+    await ctx.send(output)
+
 
 loop = asyncio.get_event_loop()
 try:
