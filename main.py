@@ -3,6 +3,8 @@ import discord
 import asyncio
 from discord.ext import commands
 import os
+import re
+from discord import File
 
 TOKEN = os.environ["token"]
 
@@ -109,6 +111,8 @@ CHARACTER_NAME_TO_ID_MAPPING = {
 }
 
 TRANSLATION_TABLE_CHARACTER = {
+    "kingk.rool": "king krool",
+    "kingkrool": "king krool",
     "palu": "palutena",
     "drmario": "dr. mario",
     "incin": "incineroar",
@@ -229,6 +233,32 @@ async def gettopthreenfpcharacter(ctx, ruleset, *, character_name):
 
     await ctx.send(output)
 
+@bot.command(name="convert")
+@commands.dm_only()
+async def convert_nfc_tools_file_to_bin(ctx):
+            export_string_lines = None
+            hex = ''
+            print(str(ctx.message.attachments[0].filename))
+            # if 'url' in str(message.attachments):
+                # print(str(message.attachments.url))
+            await ctx.message.attachments[0].save(fp='txt files/discord.txt')
+            with open('txt files/discord.txt') as file:
+                export_string_lines = file.readlines()
+        
+            for line in export_string_lines:
+                match = re.search(r"(?:[A-Fa-f0-9]{2}:){3}[A-Fa-f0-9]{2}", line)
+                if match:
+                        hex = hex + match.group(0).replace(':', '')
+        
+            bin = bytes.fromhex(hex)
+            with open(f"bin files/{str(ctx.message.attachments[0].filename).strip('.txt')}.bin", mode="wb") as new_file:
+              new_file.write(bin)
+            await ctx.send(file=File(f"bin files/{str(ctx.message.attachments[0].filename).strip('.txt')}.bin"))
+
+@convert_nfc_tools_file_to_bin.error
+async def convert_nfc_tools_file_to_bin_err(ctx, error):
+    if isinstance(error, commands.PrivateMessageOnly):
+      await ctx.send('You are not in a DM')
 
 loop = asyncio.get_event_loop()
 try:
