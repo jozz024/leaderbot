@@ -111,20 +111,20 @@ CHARACTER_NAME_TO_ID_MAPPING = {
 
 
 @bot.command(name="bestamiibo")
-async def getfirstnfp(ctx, arg1):
-    ruleset = RULSET_NAME_TO_ID_MAPPING[arg1.lower()]
-    nfp = requests.get(f"https://www.amiibots.com/api/amiibo?per_page=1&ruleset_id={ruleset}")
+async def getfirstnfp(ctx, ruleset):
+    rulesetid = RULSET_NAME_TO_ID_MAPPING[ruleset.lower()]
+    nfp = requests.get(f"https://www.amiibots.com/api/amiibo?per_page=1&ruleset_id={rulesetid}")
     firstnfprating = nfp.json()["data"][0]["rating"]
     firstnfpname = nfp.json()["data"][0]["name"]
     await ctx.send(
-        f"The highest rated {arg1} amiibo is: \n 1.) {firstnfpname} [{round(firstnfprating, 2)}]"
+        f"The highest rated {ruleset} amiibo is: \n 1.) {firstnfpname} [{round(firstnfprating, 2)}]"
     )
 
 
 @bot.command(name="top3overall")
-async def gettopthreenfp(ctx, arg1):
-    ruleset = RULSET_NAME_TO_ID_MAPPING[arg1.lower()]
-    nfp = requests.get(f"https://www.amiibots.com/api/amiibo?per_page=3&ruleset_id={ruleset}")
+async def gettopthreenfp(ctx, ruleset):
+    rulesetid = RULSET_NAME_TO_ID_MAPPING[ruleset.lower()]
+    nfp = requests.get(f"https://www.amiibots.com/api/amiibo?per_page=3&ruleset_id={rulesetid}")
     firstnfprating = nfp.json()["data"][0]["rating"]
     firstnfpname = nfp.json()["data"][0]["name"]
     secondnfprating = nfp.json()["data"][1]["rating"]
@@ -132,20 +132,24 @@ async def gettopthreenfp(ctx, arg1):
     thirdnfprating = nfp.json()["data"][2]["rating"]
     thirdnfpname = nfp.json()["data"][2]["name"]
     await ctx.send(
-        f"The highest rated {arg1} amiibo are: \n 1.) {firstnfpname} [{round(firstnfprating, 2)}] \n 2.) {secondnfpname} [{round(secondnfprating, 2)}] \n 3.) {thirdnfpname} [{round(thirdnfprating, 2)}]"
+        f"The highest rated {ruleset} amiibo are: \n 1.) {firstnfpname} [{round(firstnfprating, 2)}] \n 2.) {secondnfpname} [{round(secondnfprating, 2)}] \n 3.) {thirdnfpname} [{round(thirdnfprating, 2)}]"
     )
 
 
 @bot.command(name="top3char")
-async def gettopthreenfpcharacter(ctx, arg1, arg2):
-    character = CHARACTER_NAME_TO_ID_MAPPING[arg1.lower()]
-    ruleset = RULSET_NAME_TO_ID_MAPPING[arg2.lower()]
+async def gettopthreenfpcharacter(ctx, character_name, ruleset):
+  try:
+    character = CHARACTER_NAME_TO_ID_MAPPING[character_name.lower()]
+    rulesetid = RULSET_NAME_TO_ID_MAPPING[ruleset.lower()]
     characterlink = requests.get(
-        f"https://www.amiibots.com/api/amiibo?per_page=3&ruleset_id={ruleset}&playable_character_id={character}"
+        f"https://www.amiibots.com/api/amiibo?per_page=3&ruleset_id={rulesetid}&playable_character_id={character}"
     )
     await ctx.send(
-        f"The highest rated {arg2} {arg1} are: \n 1.) {characterlink.json()['data'][0]['name']} [{round(characterlink.json()['data'][0]['rating'], 2)}] \n 2.) {characterlink.json()['data'][1]['name']} [{round(characterlink.json()['data'][1]['rating'], 2)}] \n 3.) {characterlink.json()['data'][2]['name']} [{round(characterlink.json()['data'][2]['rating'], 2)}]"
+        f"The highest rated {ruleset} {character_name} are: \n 1.) {characterlink.json()['data'][0]['name']} [{round(characterlink.json()['data'][0]['rating'], 2)}] \n 2.) {characterlink.json()['data'][1]['name']} [{round(characterlink.json()['data'][1]['rating'], 2)}] \n 3.) {characterlink.json()['data'][2]['name']} [{round(characterlink.json()['data'][2]['rating'], 2)}]"
     )
+  except KeyError:
+    await ctx.send('Invalid argument specified.')
+
 
 loop = asyncio.get_event_loop()
 try:
