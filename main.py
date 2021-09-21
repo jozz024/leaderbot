@@ -146,7 +146,7 @@ TRANSLATION_TABLE = {
     "wft": "wii fit trainer",
     "wiifit": "wii fit trainer",
     "tink": "toon link",
-    "banjo": "banjo & kazooie"
+    "banjo": "banjo & kazooie",
     "banjoandkazooie": "banjo & kazooie"
 }
 
