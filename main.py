@@ -192,13 +192,13 @@ async def gettopthreenfpcharacter(ctx, ruleset, *, character_name):
         f"https://www.amiibots.com/api/amiibo?per_page=3&ruleset_id={rulesetid}&playable_character_id={character}"
     )
 
-    output = f"The highest rated {ruleset} {character.title()} are:"
+    output = f"The highest rated {ruleset} {character_name} are:"
 
     for i in range(0, 3):
         try:
-            output += f"\n {i}.) {characterlink.json()['data'][i]['name']} [{round(characterlink.json()['data'][i]['rating'], 2)}]"
+            output += f"\n {i+1}.) {characterlink.json()['data'][i]['name']} [{round(characterlink.json()['data'][i]['rating'], 2)}]"
         except IndexError:
-            output += f"\n {i}.) No more characters"
+            output += f"\n {i+1}.) No more characters"
 
     await ctx.send(output)
 
