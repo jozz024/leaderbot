@@ -22,8 +22,6 @@ async def on_ready():
 RULSET_NAME_TO_ID_MAPPING = {
     "vanilla": "44748ebb-e2f3-4157-90ec-029e26087ad0",
     "spirits": "328d8932-456f-4219-9fa4-c4bafdb55776",
-    "v": "44748ebb-e2f3-4157-90ec-029e26087ad0",
-    "s": "328d8932-456f-4219-9fa4-c4bafdb55776",
 }
 
 CHARACTER_NAME_TO_ID_MAPPING = {
@@ -110,7 +108,7 @@ CHARACTER_NAME_TO_ID_MAPPING = {
     "banjo & kazooie": "fe995f08-d261-47ba-ac69-81bbd272f8ce",
 }
 
-TRANSLATION_TABLE = {
+TRANSLATION_TABLE_CHARACTER = {
     "palu": "palutena",
     "drmario": "dr. mario",
     "incin": "incineroar",
@@ -154,6 +152,8 @@ TRANSLATION_TABLE = {
     "banjoandkazooie": "banjo & kazooie",
 }
 
+TRANSLATION_TABLE_RULESET = {"v": "vanilla", "s": "spirits", "spirit": "spirits"}
+
 
 @bot.command(name="bestamiibo")
 async def getfirstnfp(ctx, ruleset):
@@ -173,7 +173,11 @@ async def gettopthreenfp(ctx, ruleset):
     try:
         rulesetid = RULSET_NAME_TO_ID_MAPPING[ruleset.lower()]
     except KeyError:
-        await ctx.send(f"'{ruleset}' is an invalid ruleset.")
+        try:
+            ruleset = TRANSLATION_TABLE_RULESET[ruleset.lower().replace(" ", "")]
+            rulesetid = RULSET_NAME_TO_ID_MAPPING[ruleset]
+        except KeyError:
+            await ctx.send(f"'{ruleset}' is an invalid ruleset.")
 
     characterlink = requests.get(
         f"https://www.amiibots.com/api/amiibo?per_page=10&ruleset_id={rulesetid}"
@@ -196,23 +200,27 @@ async def gettopthreenfpcharacter(ctx, ruleset, *, character_name):
         character = CHARACTER_NAME_TO_ID_MAPPING[character_name.lower()]
     except KeyError:
         try:
-            translation = TRANSLATION_TABLE[character_name.lower().replace(" ", "")]
-            character = CHARACTER_NAME_TO_ID_MAPPING[translation]
+            character_name = TRANSLATION_TABLE_CHARACTER[
+                character_name.lower().replace(" ", "")
+            ]
+            character = CHARACTER_NAME_TO_ID_MAPPING[character_name]
         except KeyError:
             await ctx.send(f"'{character_name}' is an invalid character.")
     try:
         rulesetid = RULSET_NAME_TO_ID_MAPPING[ruleset.lower()]
     except KeyError:
-        await ctx.send(f"'{ruleset}' is an invalid ruleset.")
+        try:
+            ruleset = TRANSLATION_TABLE_RULESET[ruleset.lower().replace(" ", "")]
+            rulesetid = RULSET_NAME_TO_ID_MAPPING[ruleset]
+        except KeyError:
+            await ctx.send(f"'{ruleset}' is an invalid ruleset.")
 
     characterlink = requests.get(
         f"https://www.amiibots.com/api/amiibo?per_page=10&ruleset_id={rulesetid}&playable_character_id={character}"
     )
 
-    try:
-        output = f"The highest rated {ruleset.title()} {translation.title()} are:"
-    except UnboundLocalError:
-        output = f"The highest rated {ruleset.title()} {character_name.title()} are:"
+    output = f"The highest rated {ruleset.title()} {character_name.title()} are:"
+
     for i in range(0, 10):
         try:
             output += f"\n {i + 1}.) {characterlink.json()['data'][i]['name']} [{round(characterlink.json()['data'][i]['rating'], 2)}]"
