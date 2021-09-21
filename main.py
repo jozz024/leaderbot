@@ -8,12 +8,15 @@ TOKEN = os.environ["token"]
 
 bot = commands.Bot(command_prefix="!", description="deez")
 
+
 @bot.event
 async def on_ready():
-    print('Ready')
+    print("Ready")
 
-    await bot.change_presence(status=discord.Status.idle, activity=discord.Activity(
-        name='amiibots', type=discord.ActivityType.listening))
+    await bot.change_presence(
+        status=discord.Status.idle,
+        activity=discord.Activity(name="amiibots", type=discord.ActivityType.listening),
+    )
 
 
 RULSET_NAME_TO_ID_MAPPING = {
@@ -111,6 +114,7 @@ TRANSLATION_TABLE = {
     "palu": "palutena",
     "drmario": "dr. mario",
     "incin": "incineroar",
+    "diddy": "diddy kong",
     "bowserjr": "koopaling",
     "plant": "piranha plant",
     "mk": "meta knight",
@@ -147,14 +151,16 @@ TRANSLATION_TABLE = {
     "wiifit": "wii fit trainer",
     "tink": "toon link",
     "banjo": "banjo & kazooie",
-    "banjoandkazooie": "banjo & kazooie"
+    "banjoandkazooie": "banjo & kazooie",
 }
 
 
 @bot.command(name="bestamiibo")
 async def getfirstnfp(ctx, ruleset):
     rulesetid = RULSET_NAME_TO_ID_MAPPING[ruleset.lower()]
-    nfp = requests.get(f"https://www.amiibots.com/api/amiibo?per_page=1&ruleset_id={rulesetid}")
+    nfp = requests.get(
+        f"https://www.amiibots.com/api/amiibo?per_page=1&ruleset_id={rulesetid}"
+    )
     firstnfprating = nfp.json()["data"][0]["rating"]
     firstnfpname = nfp.json()["data"][0]["name"]
     await ctx.send(
@@ -162,25 +168,36 @@ async def getfirstnfp(ctx, ruleset):
     )
 
 
-@bot.command(name="top3overall")
+@bot.command(name="topoverall")
 async def gettopthreenfp(ctx, ruleset):
-    rulesetid = RULSET_NAME_TO_ID_MAPPING[ruleset.lower()]
-    nfp = requests.get(f"https://www.amiibots.com/api/amiibo?per_page=3&ruleset_id={rulesetid}")
-    firstnfp = nfp.json()["data"][0]
-    secondnfp = nfp.json()["data"][1]
-    thirdnfp = nfp.json()["data"][2]
-    await ctx.send(
-        f"The highest rated {ruleset} amiibo are: \n 1.) {firstnfp['name']} [{round(firstnfp['rating'], 2)}] \n 2.) {secondnfp['name']} [{round(secondnfp['rating'], 2)}] \n 3.) {thirdnfp['name']} [{round(thirdnfp['rating'], 2)}]"
+    try:
+        rulesetid = RULSET_NAME_TO_ID_MAPPING[ruleset.lower()]
+    except KeyError:
+        await ctx.send(f"'{ruleset}' is an invalid ruleset.")
+
+    characterlink = requests.get(
+        f"https://www.amiibots.com/api/amiibo?per_page=10&ruleset_id={rulesetid}"
     )
 
+    output = f"The highest rated {ruleset.title()} amiibo are:"
 
-@bot.command(name="top3char")
+    for i in range(0, 10):
+        try:
+            output += f"\n {i + 1}.) {characterlink.json()['data'][i]['name']} [{round(characterlink.json()['data'][i]['rating'], 2)}]"
+        except IndexError:
+            output += f"\n {i + 1}.) No more amiibo"
+
+    await ctx.send(output)
+
+
+@bot.command(name="topchar")
 async def gettopthreenfpcharacter(ctx, ruleset, *, character_name):
     try:
         character = CHARACTER_NAME_TO_ID_MAPPING[character_name.lower()]
     except KeyError:
         try:
-            character = CHARACTER_NAME_TO_ID_MAPPING[TRANSLATION_TABLE[character_name.lower().replace(" ", "")]]
+            translation = TRANSLATION_TABLE[character_name.lower().replace(" ", "")]
+            character = CHARACTER_NAME_TO_ID_MAPPING[translation]
         except KeyError:
             await ctx.send(f"'{character_name}' is an invalid character.")
     try:
@@ -189,24 +206,24 @@ async def gettopthreenfpcharacter(ctx, ruleset, *, character_name):
         await ctx.send(f"'{ruleset}' is an invalid ruleset.")
 
     characterlink = requests.get(
-        f"https://www.amiibots.com/api/amiibo?per_page=3&ruleset_id={rulesetid}&playable_character_id={character}"
+        f"https://www.amiibots.com/api/amiibo?per_page=10&ruleset_id={rulesetid}&playable_character_id={character}"
     )
 
-    output = f"The highest rated {ruleset} {character_name} are:"
-
-    for i in range(0, 3):
+    try:
+        output = f"The highest rated {ruleset.title()} {translation.title()} are:"
+    except UnboundLocalError:
+        output = f"The highest rated {ruleset.title()} {character_name.title()} are:"
+    for i in range(0, 10):
         try:
-            output += f"\n {i+1}.) {characterlink.json()['data'][i]['name']} [{round(characterlink.json()['data'][i]['rating'], 2)}]"
+            output += f"\n {i + 1}.) {characterlink.json()['data'][i]['name']} [{round(characterlink.json()['data'][i]['rating'], 2)}]"
         except IndexError:
-            output += f"\n {i+1}.) No more characters"
+            output += f"\n {i + 1}.) No more amiibo"
 
     await ctx.send(output)
 
 
 loop = asyncio.get_event_loop()
 try:
-    loop.run_until_complete(
-        bot.start(TOKEN)
-    )
+    loop.run_until_complete(bot.start(TOKEN))
 except KeyboardInterrupt:
     loop.run_until_complete(bot.close())
