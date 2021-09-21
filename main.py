@@ -8,6 +8,14 @@ TOKEN = os.environ["token"]
 
 bot = commands.Bot(command_prefix="!", description="deez")
 
+@bot.event
+async def on_ready():
+    print('Ready')
+
+    await bot.change_presence(status=discord.Status.idle, activity=discord.Activity(
+        name='amiibots', type=discord.ActivityType.listening))
+
+
 RULSET_NAME_TO_ID_MAPPING = {
     "vanilla": "44748ebb-e2f3-4157-90ec-029e26087ad0",
     "spirits": "328d8932-456f-4219-9fa4-c4bafdb55776",
@@ -69,6 +77,7 @@ CHARACTER_NAME_TO_ID_MAPPING = {
     "donkeykong": "9e7024ec-4a72-4887-bdad-4adbb9b0e3a9",
     "link": "9f3caa1b-1dbd-49da-b3fd-28dfadd18828",
     "captainfalcon": "b2e680f3-0c62-4387-a4ac-b539d85e90c0",
+    "falcon": "b2e680f3-0c62-4387-a4ac-b539d85e90c0",
     "ike": "b89763e0-222e-472b-a5f8-2de3dba550a7",
     "villager": "ba94257a-9223-4210-a542-ffd8a798d74c",
     "diddykong": "be1fbfb9-9555-42bb-9e77-7aa2f82c5ded",
@@ -85,8 +94,11 @@ CHARACTER_NAME_TO_ID_MAPPING = {
     "hero": "da0c84d7-9c43-4e74-92e7-113194694b25",
     "luigi": "da7df432-47e4-4cbe-9b29-1c7958197105",
     "rosalina&luma": "e2531ffe-e834-49ae-b233-56386472a6ed",
+    "rosalina": "e2531ffe-e834-49ae-b233-56386472a6ed",
     "miiswordfighter": "e3891498-94f6-4ccc-a527-c5f4e26051d1",
+    "miisword": "e3891498-94f6-4ccc-a527-c5f4e26051d1",
     "wiifittrainer": "e6f9ab43-8434-48bb-a765-ebbb97f66fae",
+    "wiifit": "e6f9ab43-8434-48bb-a765-ebbb97f66fae",
     "joker": "e7d9e195-f86e-4ac8-8bd2-7302889147eb",
     "lucario": "e9128698-7812-4636-9074-127f1983bf1b",
     "toonlink": "eea3bb5b-564a-46c4-9c4c-8cef6e59c8b1",
@@ -94,6 +106,7 @@ CHARACTER_NAME_TO_ID_MAPPING = {
     "simon": "fa1ac3ba-0880-483b-b94e-9b4952e3f999",
     "mewtwo": "fd264bc3-a141-400f-9e55-adabc783322d",
     "banjo&kazooie": "fe995f08-d261-47ba-ac69-81bbd272f8ce",
+    "banjo": "fe995f08-d261-47ba-ac69-81bbd272f8ce",
 }
 
 
@@ -130,11 +143,9 @@ async def gettopthreenfpcharacter(ctx, arg1, arg2):
     characterlink = requests.get(
         f"https://www.amiibots.com/api/amiibo?per_page=3&ruleset_id={ruleset}&playable_character_id={character}"
     )
-    print(characterlink)
     await ctx.send(
         f"The highest rated {arg2} {arg1} are: \n 1.) {characterlink.json()['data'][0]['name']} [{round(characterlink.json()['data'][0]['rating'], 2)}] \n 2.) {characterlink.json()['data'][1]['name']} [{round(characterlink.json()['data'][1]['rating'], 2)}] \n 3.) {characterlink.json()['data'][2]['name']} [{round(characterlink.json()['data'][2]['rating'], 2)}]"
     )
-
 
 loop = asyncio.get_event_loop()
 try:
