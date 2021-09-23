@@ -401,7 +401,6 @@ class BinManager:
 
     def setspirits(self, bin_location, attack, defense, ability1, ability2, ability3, saveAs_location):
         # open keys
-        directory1 = r'c:\\code\\leaderbot\\Brain_Transplant_Assets'
         hexatk = int(attack)
         hexdef = int(defense)
         hexability1 = int(SPIRITSKILLS[ability1.lower()])
