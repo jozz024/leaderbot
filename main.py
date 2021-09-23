@@ -5,16 +5,23 @@ from discord.ext import commands
 import os
 import re
 from discord import File
+from character_dictionary import CharacterDictionary
+from amiibo_functions import BinManager
+from amiibo import AmiiboMasterKey
+from ssbu_amiibo import SsbuAmiiboDump as AmiiboDump
 
 TOKEN = os.environ["token"]
 
 bot = commands.Bot(command_prefix="!", description="deez")
 
-
+default_assets_location = r"Brain_Transplant_Assets/characters.xml"
+char_dict = CharacterDictionary(default_assets_location)
+binmanagerinit = BinManager(char_dict)
+directory = os.path.dirname(os.path.realpath(__file__))
+    
 @bot.event
 async def on_ready():
     print("Ready")
-
     await bot.change_presence(
         status=discord.Status.idle,
         activity=discord.Activity(name="amiibots", type=discord.ActivityType.listening),
@@ -156,17 +163,69 @@ TRANSLATION_TABLE_CHARACTER = {
     "banjoandkazooie": "banjo & kazooie",
 }
 
+TRANSLATION_TABLE_CHARACTER_TRANSPLANT = {
+    "kingk.rool": "king k rool",
+    "krool": "king k rool",
+    "palu": "palutena",
+    "drmario": "dr. mario",
+    "incin": "incineroar",
+    "diddy": "diddy kong",
+    "bowserjr": "koopaling",
+    "plant": "piranha plant",
+    "mk": "meta knight",
+    "icies": "ice climbers",
+    "mac": "little mac",
+    "ganon": "ganondorf",
+    "pacman": "pac-man",
+    "pac": "pac-man",
+    "bayo": "bayonetta",
+    "mm": "mega man",
+    "mega": "mega man",
+    "r.o.b.": "rob",
+    "dsamus": "dark samus",
+    "pt": "pokemon trainer",
+    "gunner": "mii gunner",
+    "dh": "duck hunt",
+    "puff": "jigglypuff",
+    "zss": "zero suit samus",
+    "dpit": "dark pit",
+    "brawler": "mii brawler",
+    "gameandwatch": "game & watch",
+    "g&w": "game & watch",
+    "dk": "donkey kong",
+    "falcon": "captain falcon",
+    "dedede": "king dedede",
+    "d3": "king dedede",
+    "yink": "young link",
+    "rosa": "rosalina & luma",
+    "rosalina": "rosalina & luma",
+    "miisword": "mii swordfighter",
+    "sword": "mii swordfighter",
+    "wft": "wii fit trainer",
+    "wiifit": "wii fit trainer",
+    "tink": "toon link",
+    "banjo": "banjo & kazooie",
+    "banjoandkazooie": "banjo & kazooie",
+}
+
 TRANSLATION_TABLE_RULESET = {"v": "vanilla", "s": "spirits", "spirit": "spirits"}
 
 
 @bot.command(name="bestamiibo")
 async def getfirstnfp(ctx, ruleset):
-    rulesetid = RULSET_NAME_TO_ID_MAPPING[ruleset.lower()]
-    nfp = requests.get(
-        f"https://www.amiibots.com/api/amiibo?per_page=1&ruleset_id={rulesetid}"
+    try:
+        rulesetid = RULSET_NAME_TO_ID_MAPPING[ruleset.lower()]
+    except KeyError:
+        try:
+            ruleset = TRANSLATION_TABLE_RULESET[ruleset.lower().replace(" ", "")]
+            rulesetid = RULSET_NAME_TO_ID_MAPPING[ruleset]
+        except KeyError:
+          ctx.send('Invalid ruleset.')
+    characterlink = requests.get(
+        f"https://www.amiibots.com/api/amiibo?per_page=10&ruleset_id={rulesetid}"
     )
-    firstnfprating = nfp.json()["data"][0]["rating"]
-    firstnfpname = nfp.json()["data"][0]["name"]
+    firstnfprating = characterlink.json()["data"][0]["rating"]
+    firstnfpname = characterlink.json()["data"][0]["name"]
     await ctx.send(
         f"The highest rated {ruleset} amiibo is: \n 1.) {firstnfpname} [{round(firstnfprating, 2)}]"
     )
@@ -255,10 +314,60 @@ async def convert_nfc_tools_file_to_bin(ctx):
               new_file.write(bin)
             await ctx.send(file=File(f"bin files/{str(ctx.message.attachments[0].filename).strip('.txt')}.bin"))
 
+@bot.command(name="transplant")
+@commands.dm_only()
+async def brain_transplant(ctx, *, character):
+            try:
+                character = character
+                await ctx.message.attachments[0].save(fp=f'old bins/{ctx.message.attachments[0].filename}')
+                binmanagerinit.transplant(bin_location=f'old bins/{ctx.message.attachments[0].filename}', character=character.title(), saveAs_location=f'new bins/{ctx.message.attachments[0].filename}', randomize_SN=True)
+                await ctx.send(file=File(f'new bins/{ctx.message.attachments[0].filename}'))
+            except KeyError:
+                try:
+                    character = TRANSLATION_TABLE_CHARACTER_TRANSPLANT[
+                        character.replace(" ", "")
+                    ]
+                    await ctx.message.attachments[0].save(fp=f'old bins/{ctx.message.attachments[0].filename}')
+                    binmanagerinit.transplant(bin_location=f'old bins/{ctx.message.attachments[0].filename}', character=character.title(), saveAs_location=f'new bins/{ctx.message.attachments[0].filename}', randomize_SN=True)
+                    await ctx.send(file=File(f'new bins/{ctx.message.attachments[0].filename}'))
+                except KeyError:
+                    await ctx.send(f"'{character}' is an invalid character.")
+
+@bot.command(name="shuffleSN".lower())
+@commands.dm_only()
+async def shufflenfpsn(ctx):
+            await ctx.message.attachments[0].save(fp=f'old bins/{ctx.message.attachments[0].filename}')
+            binmanagerinit.randomize_sn(bin_location=f'old bins/{ctx.message.attachments[0].filename}')
+            await ctx.send(file=File(f'old bins/{ctx.message.attachments[0].filename}'))
+            
+@bot.command(name="setspirits")
+async def spiritedit(ctx, attack, defense, ability1, ability2, ability3):
+    await ctx.message.attachments[0].save(fp=f'old bins/{ctx.message.attachments[0].filename}')
+    try:
+        binmanagerinit.setspirits(f'old bins/{ctx.message.attachments[0].filename}', attack, defense, ability1, ability2, ability3, f'new bins/{ctx.message.attachments[0].filename}')
+        await ctx.send(f'{attack}, {defense}', file=File(f'new bins/{ctx.message.attachments[0].filename}'))
+    except IndexError:
+        await ctx.send('Illegal Setup')
+        
+@bot.command(name="list")
+async def list(ctx):
+  await ctx.send(str(TRANSLATION_TABLE_CHARACTER).replace(':', ' -->').replace(',', '\n').strip('{').strip('}').replace("'", ""))
+
 @convert_nfc_tools_file_to_bin.error
 async def convert_nfc_tools_file_to_bin_err(ctx, error):
     if isinstance(error, commands.PrivateMessageOnly):
       await ctx.send('You are not in a DM')
+      
+@brain_transplant.error
+async def brain_transplant_err(ctx, error):
+    if isinstance(error, commands.PrivateMessageOnly):
+      await ctx.send('You are not in a DM')
+
+@shufflenfpsn.error
+async def shufflenfpsn_err(ctx, error):
+    if isinstance(error, commands.PrivateMessageOnly):
+      await ctx.send('You are not in a DM')
+
 
 loop = asyncio.get_event_loop()
 try:
