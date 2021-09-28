@@ -1,334 +1,356 @@
 from amiibo import AmiiboMasterKey
-import random
 from ssbu_amiibo import SsbuAmiiboDump as AmiiboDump
+import random
 
 SPIRITSKILLS = {
-'none': 0,
-'movespeedup': 1,
-'hypersmashattacks': 2,
-'jumpup': 4,
-'additionalmidairjump': 5,
-'easierdodging': 8,
-'easierperfectshield': 9,
-'superarmor': 10,
-'slowsuperarmor': 11,
-'trade-offattacksup': 12,
-'trade-offdefenseup': 13,
-'trade-offspeedup': 14,
-'trade-offabilityup': 15,
-'critical-healthattackup': 16,
-'critical-healthdefenseup': 17,
-'critical-healthstatsup': 18,
-'criticalimmunity': 19,
-'autoheal': 20,
-'poisonimmunity': 21,
-'poisondamagereduced': 22,
-'poisonheals': 23,
-'lava-floorimmunity': 24,
-'sticky-floorimmunity': 25,
-'beamswordequipped': 26,
-'lipsstickequipped': 27,
-'starrodequipped': 28,
-'oreclubequipped': 29,
-'raygunequipped': 31,
-'superscopeequipped': 32,
-'drillequipped': 34,
-'greenshellequipped': 35,
-'backshieldequipped': 38,
-'bunnyhoodequipped': 39,
-'madeofmetal': 40,
-'mouthfulofcurry': 41,
-'franklinbadgeequipped': 42,
-'fairybottleequipped': 44,
-'fireflowerequipped': 45,
-'freezieequipped': 46,
-'ramblinevilmushroomequipped': 47,
-'killingedgeequipped': 48,
-'physicalattackup': 50,
-'weaponattackup': 51,
-'fistattackup': 52,
-'footattackup': 53,
-'auraattackup': 54,
-'magicattackup': 55,
-'psiattackup': 56,
-'fire&explosionattackup': 58,
-'electricattackup': 60,
-'energy-shotattackup': 61,
-'water&iceattackup': 62,
-'magicresistup': 63,
-'psiresistup': 64,
-'fire/explosionresistup': 66,
-'electricresistup': 69,
-'energy-shotresistup': 70,
-'water/freezingresistup': 72,
-'auraresistup': 73,
-'zap-floorimmunity': 74,
-'slumberimmunity': 75,
-'ice-floorimmunity': 76,
-'fallingimmunity': 77,
-'buryimmunity': 78,
-'brakingabilityup': 79,
-'landinglagdown': 81,
-'lightweight': 82,
-'shielddamageup': 83,
-'airattackup': 84,
-'airdefenseup': 85,
-'neutralspecialup': 86,
-'sidespecialup': 87,
-'upspecialup': 88,
-'downspecialup': 89,
-'strongthrow': 90,
-'unflinchingchargedsmashes': 91,
-'toss&meteor': 92,
-'criticalhitup': 94,
-'swimmer': 95,
-'shielddurabilityup': 96,
-'improvedescape': 97,
-'batteringitemsup': 101,
-'shootingitemsup': 102,
-'thrownitemsup': 103,
-'koshealdamage': 104,
-'invincibilityaftereating': 105,
-'statsupaftereating': 106,
-'first-strikeadvantage': 108,
-'runningstart': 110,
-'fastfinalsmashmeter': 112,
-'instadrop': 113,
-'healingshield': 114,
-'floatyjumps': 117,
-'irreversiblecontrols': 119,
-'transformationdurationup': 121,
-'undamagedattackup': 122,
-'undamagedspeedup': 123,
-'undamagedattack&speedup': 124,
-'impactrun': 128,
-'lava-floorresist': 130,
-'itemgravitation': 131,
-'chanceofdoublefinalsmash': 133,
-'doublefinalsmash': 134,
-'giant': 138,
-'dashattackup': 139,
-'armorknight': 140,
-'energyshotattack/resistanceup': 142,
-'hammerdurationup': 143,
-'boomerangequipped': 144,
-'perfect-shieldreflect': 151,
-'weaponattack&movespeedup': 152,
-'shootingattackup': 153,
-'screen-flipimmunity': 156,
-'fogimmunity': 157,
-'gravity-changeimmunity': 158,
-'staminaup': 159,
-'strong-windresist': 160,
-'strong-windimmunity': 161,
-'critical-healthhealing': 162,
-'special-movepowerup': 163,
-'bob-ombequipped': 165,
-'hotheadequipped': 166,
-'superleafequipped': 167,
-'superlaunchstarequipped': 168,
-'beastballequipped': 169,
-'deathsscytheequipped': 170,
-'mr.saturnequipped': 171,
-'uniraequipped': 172,
-'rocketbeltequipped': 173,
-'blackholeequipped': 174,
-'statsupupaftereating': 176,
-'critical-healthstatsupup': 178,
-'criticalhitupup': 179,
-'greatautoheal': 180,
-'steeldiverequipped': 181,
-'bananagunequipped': 182,
-'rageblasterequipped': 183,
-'staffequipped': 184,
-'firebarequipped': 185,
-'screwattackequipped': 186,
-'bomberequipped': 187,
-'giantkiller': 213,
-'metalkiller': 214,
-'assistkiller': 215,
-'jamfscharge': 216,
-'weaponresistup': 217,
-'itemautograb': 227,
-'teampowerup': 228,
-'poisonpowerup': 230,
-'criticalfastfinalsmashmeterupup': 231,
-'critical-healthhealingupup': 232,
-'criticalsupergiant': 233,
-'mouthfulofcurryupup': 234,
-'finalsmashup': 235,
-'criticalhealing&metal': 236,
+    "none": 0,
+    "movespeedup": 1,
+    "hypersmashattacks": 2,
+    "jumpup": 4,
+    "additionalmidairjump": 5,
+    "easierdodging": 8,
+    "easierperfectshield": 9,
+    "superarmor": 10,
+    "slowsuperarmor": 11,
+    "trade-offattacksup": 12,
+    "trade-offdefenseup": 13,
+    "trade-offspeedup": 14,
+    "trade-offabilityup": 15,
+    "critical-healthattackup": 16,
+    "critical-healthdefenseup": 17,
+    "critical-healthstatsup": 18,
+    "criticalimmunity": 19,
+    "autoheal": 20,
+    "poisonimmunity": 21,
+    "poisondamagereduced": 22,
+    "poisonheals": 23,
+    "lava-floorimmunity": 24,
+    "sticky-floorimmunity": 25,
+    "beamswordequipped": 26,
+    "lipsstickequipped": 27,
+    "starrodequipped": 28,
+    "oreclubequipped": 29,
+    "raygunequipped": 31,
+    "superscopeequipped": 32,
+    "drillequipped": 34,
+    "greenshellequipped": 35,
+    "backshieldequipped": 38,
+    "bunnyhoodequipped": 39,
+    "madeofmetal": 40,
+    "mouthfulofcurry": 41,
+    "franklinbadgeequipped": 42,
+    "fairybottleequipped": 44,
+    "fireflowerequipped": 45,
+    "freezieequipped": 46,
+    "ramblinevilmushroomequipped": 47,
+    "killingedgeequipped": 48,
+    "physicalattackup": 50,
+    "weaponattackup": 51,
+    "fistattackup": 52,
+    "footattackup": 53,
+    "auraattackup": 54,
+    "magicattackup": 55,
+    "psiattackup": 56,
+    "fire&explosionattackup": 58,
+    "electricattackup": 60,
+    "energy-shotattackup": 61,
+    "water&iceattackup": 62,
+    "magicresistup": 63,
+    "psiresistup": 64,
+    "fire/explosionresistup": 66,
+    "electricresistup": 69,
+    "energy-shotresistup": 70,
+    "water/freezingresistup": 72,
+    "auraresistup": 73,
+    "zap-floorimmunity": 74,
+    "slumberimmunity": 75,
+    "ice-floorimmunity": 76,
+    "fallingimmunity": 77,
+    "buryimmunity": 78,
+    "brakingabilityup": 79,
+    "landinglagdown": 81,
+    "lightweight": 82,
+    "shielddamageup": 83,
+    "airattackup": 84,
+    "airdefenseup": 85,
+    "neutralspecialup": 86,
+    "sidespecialup": 87,
+    "upspecialup": 88,
+    "downspecialup": 89,
+    "strongthrow": 90,
+    "unflinchingchargedsmashes": 91,
+    "toss&meteor": 92,
+    "criticalhitup": 94,
+    "swimmer": 95,
+    "shielddurabilityup": 96,
+    "improvedescape": 97,
+    "batteringitemsup": 101,
+    "shootingitemsup": 102,
+    "thrownitemsup": 103,
+    "koshealdamage": 104,
+    "invincibilityaftereating": 105,
+    "statsupaftereating": 106,
+    "first-strikeadvantage": 108,
+    "runningstart": 110,
+    "fastfinalsmashmeter": 112,
+    "instadrop": 113,
+    "healingshield": 114,
+    "floatyjumps": 117,
+    "irreversiblecontrols": 119,
+    "transformationdurationup": 121,
+    "undamagedattackup": 122,
+    "undamagedspeedup": 123,
+    "undamagedattack&speedup": 124,
+    "impactrun": 128,
+    "lava-floorresist": 130,
+    "itemgravitation": 131,
+    "chanceofdoublefinalsmash": 133,
+    "doublefinalsmash": 134,
+    "giant": 138,
+    "dashattackup": 139,
+    "armorknight": 140,
+    "energyshotattack/resistanceup": 142,
+    "hammerdurationup": 143,
+    "boomerangequipped": 144,
+    "perfect-shieldreflect": 151,
+    "weaponattack&movespeedup": 152,
+    "shootingattackup": 153,
+    "screen-flipimmunity": 156,
+    "fogimmunity": 157,
+    "gravity-changeimmunity": 158,
+    "staminaup": 159,
+    "strong-windresist": 160,
+    "strong-windimmunity": 161,
+    "critical-healthhealing": 162,
+    "special-movepowerup": 163,
+    "bob-ombequipped": 165,
+    "hotheadequipped": 166,
+    "superleafequipped": 167,
+    "superlaunchstarequipped": 168,
+    "beastballequipped": 169,
+    "deathsscytheequipped": 170,
+    "mr.saturnequipped": 171,
+    "uniraequipped": 172,
+    "rocketbeltequipped": 173,
+    "blackholeequipped": 174,
+    "statsupupaftereating": 176,
+    "critical-healthstatsupup": 178,
+    "criticalhitupup": 179,
+    "greatautoheal": 180,
+    "steeldiverequipped": 181,
+    "bananagunequipped": 182,
+    "rageblasterequipped": 183,
+    "staffequipped": 184,
+    "firebarequipped": 185,
+    "screwattackequipped": 186,
+    "bomberequipped": 187,
+    "giantkiller": 213,
+    "metalkiller": 214,
+    "assistkiller": 215,
+    "jamfscharge": 216,
+    "weaponresistup": 217,
+    "itemautograb": 227,
+    "teampowerup": 228,
+    "poisonpowerup": 230,
+    "criticalfastfinalsmashmeterupup": 231,
+    "critical-healthhealingupup": 232,
+    "criticalsupergiant": 233,
+    "mouthfulofcurryupup": 234,
+    "finalsmashup": 235,
+    "criticalhealing&metal": 236,
 }
+
 SKILLSLOTS = {
-'none': 0,
-'movespeedup': 1,
-'hypersmashattacks': 1,
-'jumpup': 1,
-'additionalmidairjump': 2,
-'easierdodging': 1,
-'easierperfectshield': 1,
-'superarmor': 3,
-'slowsuperarmor': 2,
-'trade-offattacksup': 1,
-'trade-offdefenseup': 1,
-'trade-offspeedup': 1,
-'trade-offabilityup': 1,
-'critical-healthattackup': 1,
-'critical-healthdefenseup': 1,
-'critical-healthstatsup': 1,
-'criticalimmunity': 2,
-'autoheal': 2,
-'poisonimmunity': 2,
-'poisondamagereduced': 1,
-'poisonheals': 3,
-'lava-floorimmunity': 2,
-'sticky-floorimmunity': 2,
-'beamswordequipped': 1,
-'lipsstickequipped': 1,
-'starrodequipped': 1,
-'oreclubequipped': 3,
-'raygunequipped': 2,
-'superscopeequipped': 2,
-'drillequipped': 1,
-'greenshellequipped': 1,
-'backshieldequipped': 1,
-'bunnyhoodequipped': 1,
-'madeofmetal': 1,
-'mouthfulofcurry': 2,
-'franklinbadgeequipped': 2,
-'fairybottleequipped': 1,
-'fireflowerequipped': 1,
-'freezieequipped': 1,
-'ramblinevilmushroomequipped': 1,
-'killingedgeequipped': 1,
-'physicalattackup': 1,
-'weaponattackup': 1,
-'fistattackup': 1,
-'footattackup': 1,
-'auraattackup': 1,
-'magicattackup': 1,
-'psiattackup': 1,
-'fire&explosionattackup': 1,
-'electricattackup': 1,
-'energy-shotattackup': 1,
-'water&iceattackup': 1,
-'magicresistup': 1,
-'psiresistup': 1,
-'fire/explosionresistup': 1,
-'electricresistup': 1,
-'energy-shotresistup': 1,
-'water/freezingresistup': 1,
-'auraresistup': 1,
-'zap-floorimmunity': 2,
-'slumberimmunity': 1,
-'ice-floorimmunity': 2,
-'fallingimmunity': 1,
-'buryimmunity': 1,
-'brakingabilityup': 1,
-'landinglagdown': 1,
-'lightweight': 1,
-'shielddamageup': 1,
-'airattackup': 1,
-'airdefenseup': 1,
-'neutralspecialup': 1,
-'sidespecialup': 1,
-'upspecialup': 1,
-'downspecialup': 1,
-'strongthrow': 1,
-'unflinchingchargedsmashes': 2,
-'toss&meteor': 1,
-'criticalhitup': 1,
-'swimmer': 1,
-'shielddurabilityup': 1,
-'improvedescape': 1,
-'batteringitemsup': 1,
-'shootingitemsup': 1,
-'thrownitemsup': 1,
-'koshealdamage': 2,
-'invincibilityaftereating': 2,
-'statsupaftereating': 1,
-'first-strikeadvantage': 2,
-'runningstart': 2,
-'fastfinalsmashmeter': 2,
-'instadrop': 2,
-'healingshield': 2,
-'floatyjumps': 1,
-'irreversiblecontrols': 2,
-'transformationdurationup': 1,
-'undamagedattackup': 1,
-'undamagedspeedup': 1,
-'undamagedattack&speedup': 1,
-'impactrun': 1,
-'lava-floorresist': 1,
-'itemgravitation': 1,
-'chanceofdoublefinalsmash': 2,
-'doublefinalsmash': 3,
-'giant': 2,
-'dashattackup': 1,
-'armorknight': 2,
-'energyshotattack/resistanceup': 2,
-'hammerdurationup': 1,
-'boomerangequipped': 1,
-'perfect-shieldreflect': 1,
-'weaponattack&movespeedup': 2,
-'shootingattackup': 1,
-'screen-flipimmunity': 2,
-'fogimmunity': 2,
-'gravity-changeimmunity': 2,
-'staminaup': 1,
-'strong-windresist': 1,
-'strong-windimmunity': 2,
-'critical-healthhealing': 2,
-'special-movepowerup': 1,
-'bob-ombequipped': 1,
-'hotheadequipped': 2,
-'superleafequipped': 1,
-'superlaunchstarequipped': 1,
-'beastballequipped': 1,
-'deathsscytheequipped': 1,
-'mr.saturnequipped': 1,
-'uniraequipped': 1,
-'rocketbeltequipped': 1,
-'blackholeequipped': 2,
-'statsupupaftereating': 2,
-'critical-healthstatsupup': 2,
-'criticalhitupup': 2,
-'greatautoheal': 3,
-'steeldiverequipped': 2,
-'bananagunequipped': 1,
-'rageblasterequipped': 1,
-'staffequipped': 1,
-'firebarequipped': 1,
-'screwattackequipped': 2,
-'bomberequipped': 1,
-'giantkiller': 1,
-'metalkiller': 1,
-'assistkiller': 1,
-'jamfscharge': 2,
-'weaponresistup': 2,
-'itemautograb': 1,
-'teampowerup': 2,
-'poisonpowerup': 3,
-'criticalfastfinalsmashmeterupup': 3,
-'critical-healthhealingupup': 3,
-'criticalsupergiant': 3,
-'mouthfulofcurryupup': 3,
-'finalsmashup': 2,
-'criticalhealing&metal': 2,
+    "none": 0,
+    "movespeedup": 1,
+    "hypersmashattacks": 1,
+    "jumpup": 1,
+    "additionalmidairjump": 2,
+    "easierdodging": 1,
+    "easierperfectshield": 1,
+    "superarmor": 3,
+    "slowsuperarmor": 2,
+    "trade-offattacksup": 1,
+    "trade-offdefenseup": 1,
+    "trade-offspeedup": 1,
+    "trade-offabilityup": 1,
+    "critical-healthattackup": 1,
+    "critical-healthdefenseup": 1,
+    "critical-healthstatsup": 1,
+    "criticalimmunity": 2,
+    "autoheal": 2,
+    "poisonimmunity": 2,
+    "poisondamagereduced": 1,
+    "poisonheals": 3,
+    "lava-floorimmunity": 2,
+    "sticky-floorimmunity": 2,
+    "beamswordequipped": 1,
+    "lipsstickequipped": 1,
+    "starrodequipped": 1,
+    "oreclubequipped": 3,
+    "raygunequipped": 2,
+    "superscopeequipped": 2,
+    "drillequipped": 1,
+    "greenshellequipped": 1,
+    "backshieldequipped": 1,
+    "bunnyhoodequipped": 1,
+    "madeofmetal": 1,
+    "mouthfulofcurry": 2,
+    "franklinbadgeequipped": 2,
+    "fairybottleequipped": 1,
+    "fireflowerequipped": 1,
+    "freezieequipped": 1,
+    "ramblinevilmushroomequipped": 1,
+    "killingedgeequipped": 1,
+    "physicalattackup": 1,
+    "weaponattackup": 1,
+    "fistattackup": 1,
+    "footattackup": 1,
+    "auraattackup": 1,
+    "magicattackup": 1,
+    "psiattackup": 1,
+    "fire&explosionattackup": 1,
+    "electricattackup": 1,
+    "energy-shotattackup": 1,
+    "water&iceattackup": 1,
+    "magicresistup": 1,
+    "psiresistup": 1,
+    "fire/explosionresistup": 1,
+    "electricresistup": 1,
+    "energy-shotresistup": 1,
+    "water/freezingresistup": 1,
+    "auraresistup": 1,
+    "zap-floorimmunity": 2,
+    "slumberimmunity": 1,
+    "ice-floorimmunity": 2,
+    "fallingimmunity": 1,
+    "buryimmunity": 1,
+    "brakingabilityup": 1,
+    "landinglagdown": 1,
+    "lightweight": 1,
+    "shielddamageup": 1,
+    "airattackup": 1,
+    "airdefenseup": 1,
+    "neutralspecialup": 1,
+    "sidespecialup": 1,
+    "upspecialup": 1,
+    "downspecialup": 1,
+    "strongthrow": 1,
+    "unflinchingchargedsmashes": 2,
+    "toss&meteor": 1,
+    "criticalhitup": 1,
+    "swimmer": 1,
+    "shielddurabilityup": 1,
+    "improvedescape": 1,
+    "batteringitemsup": 1,
+    "shootingitemsup": 1,
+    "thrownitemsup": 1,
+    "koshealdamage": 2,
+    "invincibilityaftereating": 2,
+    "statsupaftereating": 1,
+    "first-strikeadvantage": 2,
+    "runningstart": 2,
+    "fastfinalsmashmeter": 2,
+    "instadrop": 2,
+    "healingshield": 2,
+    "floatyjumps": 1,
+    "irreversiblecontrols": 2,
+    "transformationdurationup": 1,
+    "undamagedattackup": 1,
+    "undamagedspeedup": 1,
+    "undamagedattack&speedup": 1,
+    "impactrun": 1,
+    "lava-floorresist": 1,
+    "itemgravitation": 1,
+    "chanceofdoublefinalsmash": 2,
+    "doublefinalsmash": 3,
+    "giant": 2,
+    "dashattackup": 1,
+    "armorknight": 2,
+    "energyshotattack/resistanceup": 2,
+    "hammerdurationup": 1,
+    "boomerangequipped": 1,
+    "perfect-shieldreflect": 1,
+    "weaponattack&movespeedup": 2,
+    "shootingattackup": 1,
+    "screen-flipimmunity": 2,
+    "fogimmunity": 2,
+    "gravity-changeimmunity": 2,
+    "staminaup": 1,
+    "strong-windresist": 1,
+    "strong-windimmunity": 2,
+    "critical-healthhealing": 2,
+    "special-movepowerup": 1,
+    "bob-ombequipped": 1,
+    "hotheadequipped": 2,
+    "superleafequipped": 1,
+    "superlaunchstarequipped": 1,
+    "beastballequipped": 1,
+    "deathsscytheequipped": 1,
+    "mr.saturnequipped": 1,
+    "uniraequipped": 1,
+    "rocketbeltequipped": 1,
+    "blackholeequipped": 2,
+    "statsupupaftereating": 2,
+    "critical-healthstatsupup": 2,
+    "criticalhitupup": 2,
+    "greatautoheal": 3,
+    "steeldiverequipped": 2,
+    "bananagunequipped": 1,
+    "rageblasterequipped": 1,
+    "staffequipped": 1,
+    "firebarequipped": 1,
+    "screwattackequipped": 2,
+    "bomberequipped": 1,
+    "giantkiller": 1,
+    "metalkiller": 1,
+    "assistkiller": 1,
+    "jamfscharge": 2,
+    "weaponresistup": 2,
+    "itemautograb": 1,
+    "teampowerup": 2,
+    "poisonpowerup": 3,
+    "criticalfastfinalsmashmeterupup": 3,
+    "critical-healthhealingupup": 3,
+    "criticalsupergiant": 3,
+    "mouthfulofcurryupup": 3,
+    "finalsmashup": 2,
+    "criticalhealing&metal": 2,
+}
+
+SPIRITSKILLTABLE = {
+    "toa": "trade-offabilityup",
+    "toab": "trade-offabilityup",
+    "toability": "trade-offabilityup",
+    "tradeoffability": "trade-offabilityup",
+    "toat": "trade-offattacksup",
+    "toatk": "trade-offattacksup",
+    "toattack": "trade-offattacksup",
+    "tradeoffattak": "trade-offattacksup",
+    "tod": "trade-offdefenseup",
+    "todf": "trade-offdefenseup",
+    "todefense": "trade-offdefenseup",
+    "tradeoffdefense": "trade-offdefenseup",
 }
 
 
 class BinManager:
-    def __init__(self, char_dict, key_directory=r'c:/code/leaderbot/Brain_Transplant_Assets/key_retail.bin'):
+    def __init__(self, char_dict, key_directory="Brain_Transplant_Assets"):
         """
         This class manages bin files, does transplants and serial editing
         :param char_dict:
         """
         self.characters = char_dict
         self.key_directory = key_directory
-        with open(self.key_directory, 'rb') as fp_j:
-            self.master_keys = AmiiboMasterKey.from_combined_bin(
-                fp_j.read())
+        with open(
+            r"/".join([self.key_directory, "unfixed-info.bin"]), "rb"
+        ) as fp_d, open(
+            r"/".join([self.key_directory, "locked-secret.bin"]), "rb"
+        ) as fp_t:
+            self.master_keys = AmiiboMasterKey.from_separate_bin(
+                fp_d.read(), fp_t.read()
+            )
+
     def __open_bin(self, bin_location):
         """
         Opens a bin and makes it 540 bytes if it wasn't
@@ -336,7 +358,7 @@ class BinManager:
         :param bin_location: file location of bin you want to open
         :return: opened bin
         """
-        bin_fp = open(bin_location, 'rb')
+        bin_fp = open(bin_location, "rb")
 
         bin_dump = bytes()
         for line in bin_fp:
@@ -344,19 +366,19 @@ class BinManager:
         bin_fp.close()
 
         if len(bin_dump) == 540:
-            with open(bin_location, 'rb') as fp:
+            with open(bin_location, "rb") as fp:
                 dump = AmiiboDump(self.master_keys, fp.read())
                 return dump
         elif 532 <= len(bin_dump) <= 572:
             while len(bin_dump) < 540:
-                bin_dump += b'\x00'
+                bin_dump += b"\x00"
             if len(bin_dump) > 540:
-                bin_dump = bin_dump[:-(len(bin_dump) - 540)]
-            b = open(bin_location, 'wb')
+                bin_dump = bin_dump[: -(len(bin_dump) - 540)]
+            b = open(bin_location, "wb")
             b.write(bin_dump)
             b.close()
 
-            with open(bin_location, 'rb') as fp:
+            with open(bin_location, "rb") as fp:
                 dump = AmiiboDump(self.master_keys, fp.read())
                 return dump
         else:
@@ -386,8 +408,8 @@ class BinManager:
             temp_sn = temp_sn[2:]
             # creates leading zero
             if len(temp_sn) == 1:
-                temp_sn = '0' + temp_sn
-            serial_number += ' ' + temp_sn
+                temp_sn = "0" + temp_sn
+            serial_number += " " + temp_sn
         # if unlocked, keep it unlocked, otherwise unlock and lock
         if not dump.is_locked:
             dump.uid_hex = serial_number
@@ -396,43 +418,138 @@ class BinManager:
             dump.uid_hex = serial_number
             dump.lock()
         if bin_location is not None:
-            with open(bin_location, 'wb') as fp:
+            with open(bin_location, "wb") as fp:
                 fp.write(dump.data)
 
-    def setspirits(self, bin_location, attack, defense, ability1, ability2, ability3, saveAs_location):
-        # open keys
-        hexatk = int(attack)
-        hexdef = int(defense)
-        hexability1 = int(SPIRITSKILLS[ability1.lower()])
-        hexability2 = int(SPIRITSKILLS[ability2.lower()])
-        hexability3 = int(SPIRITSKILLS[ability3.lower()])
-        maxstats = 5000
-        with open(bin_location, 'rb') as fp:
+    def setspirits(
+        self,
+        bin_location,
+        attack,
+        defense,
+        ability1,
+        ability2,
+        ability3,
+        saveAs_location,
+    ):
+        try:
+            hexatk = int(attack)
+            hexdef = int(defense)
+            hexability1 = int(SPIRITSKILLS[ability1.lower()])
+            hexability2 = int(SPIRITSKILLS[ability2.lower()])
+            hexability3 = int(SPIRITSKILLS[ability3.lower()])
+            maxstats = 5000
+            with open(bin_location, "rb") as fp:
+                dump = AmiiboDump(self.master_keys, fp.read())
+            dump.unlock()
+
+            slotsfilled = (
+                SKILLSLOTS[ability1.lower()]
+                + SKILLSLOTS[ability2.lower()]
+                + SKILLSLOTS[ability3.lower()]
+            )
+            if slotsfilled == 1:
+                maxstats = maxstats - 300
+            if slotsfilled == 2:
+                maxstats = maxstats - 500
+            if slotsfilled == 3:
+                maxstats = maxstats - 800
+            print(hexatk + hexdef)
+            print(maxstats)
+            if hexatk + hexdef <= maxstats:
+                dump.data[0x1A4:0x1A6] = hexatk.to_bytes(2, "little")
+                dump.data[0x1A6:0x1A8] = hexdef.to_bytes(2, "little")
+                dump.data[0x140:0x141] = hexability1.to_bytes(1, "little")
+                dump.data[0x141:0x142] = hexability2.to_bytes(1, "little")
+                dump.data[0x142:0x143] = hexability3.to_bytes(1, "little")
+                dump.lock()
+                with open(saveAs_location, "wb") as fp:
+                    fp.write(dump.data)
+            else:
+                dump.lock()
+                raise IndexError("Illegal Bin")
+        except KeyError:
+            hexatk = int(attack)
+            hexdef = int(defense)
+            hexability1 = int(SPIRITSKILLS[SPIRITSKILLTABLE[ability1.lower()]])
+            hexability2 = int(SPIRITSKILLS[SPIRITSKILLTABLE[ability2.lower()]])
+            hexability3 = int(SPIRITSKILLS[SPIRITSKILLTABLE[ability3.lower()]])
+            maxstats = 5000
+            with open(bin_location, "rb") as fp:
+                dump = AmiiboDump(self.master_keys, fp.read())
+            dump.unlock()
+
+            slotsfilled = (
+                SKILLSLOTS[SPIRITSKILLTABLE[ability1.lower()]]
+                + SKILLSLOTS[SPIRITSKILLTABLE[ability2.lower()]]
+                + SKILLSLOTS[SPIRITSKILLTABLE[ability3.lower()]]
+            )
+            if slotsfilled == 1:
+                maxstats = maxstats - 300
+            if slotsfilled == 2:
+                maxstats = maxstats - 500
+            if slotsfilled == 3:
+                maxstats = maxstats - 800
+            print(hexatk + hexdef)
+            print(maxstats)
+            if hexatk + hexdef <= maxstats:
+                dump.data[0x1A4:0x1A6] = hexatk.to_bytes(2, "little")
+                dump.data[0x1A6:0x1A8] = hexdef.to_bytes(2, "little")
+                dump.data[0x140:0x141] = hexability1.to_bytes(1, "little")
+                dump.data[0x141:0x142] = hexability2.to_bytes(1, "little")
+                dump.data[0x142:0x143] = hexability3.to_bytes(1, "little")
+                dump.lock()
+                with open(saveAs_location, "wb") as fp:
+                    fp.write(dump.data)
+            else:
+                dump.lock()
+                raise IndexError("Illegal Bin")
+
+    def dump_to_amiitools(self, dump):
+        """Convert a standard Amiibo/NTAG215 dump to the 3DS/amiitools internal
+        format.
+        """
+        internal = bytearray(dump)
+        internal[0x000:0x008] = dump[0x008:0x010]
+        internal[0x008:0x028] = dump[0x080:0x0A0]
+        internal[0x028:0x04C] = dump[0x010:0x034]
+        internal[0x04C:0x1B4] = dump[0x0A0:0x208]
+        internal[0x1B4:0x1D4] = dump[0x034:0x054]
+        internal[0x1D4:0x1DC] = dump[0x000:0x008]
+        internal[0x1DC:0x208] = dump[0x054:0x080]
+        return internal
+
+    def decrypt(self, bin_location, saveAs_location):
+        with open(bin_location, "rb") as fp:
             dump = AmiiboDump(self.master_keys, fp.read())
         dump.unlock()
-        
-        slotsfilled = SKILLSLOTS[ability1.lower()] + SKILLSLOTS[ability2.lower()] + SKILLSLOTS[ability3.lower()]
-        if slotsfilled == 1:
-            maxstats = maxstats - 300
-        if slotsfilled == 2:
-            maxstats = maxstats - 500
-        if slotsfilled == 3:
-            maxstats = maxstats - 800
-        print(hexatk + hexdef)
-        print(maxstats)
-        if hexatk + hexdef <= maxstats:
-            dump.data[0x1A4:0x1A6] = hexatk.to_bytes(2, 'little')
-            dump.data[0x1A6:0x1A8] = hexdef.to_bytes(2, 'little')
-            dump.data[0x140:0x141] = hexability1.to_bytes(1, 'little')
-            dump.data[0x141:0x142] = hexability2.to_bytes(1, 'little')
-            dump.data[0x142:0x143] = hexability3.to_bytes(1, 'little')
-            dump.lock()
-            with open(saveAs_location, 'wb') as fp:
-                fp.write(dump.data)
-        else: 
-            dump.lock()
-            raise IndexError('Illegal Bin')
-            
+        data = self.dump_to_amiitools(dump.data)
+        with open(saveAs_location, "wb") as fp:
+            fp.write(data)
+
+    def personalityedit(
+        self,
+        bin_location,
+        aggression,
+        edgeguard,
+        anticipation,
+        defensiveness,
+        saveAs_location,
+    ):
+        aggression = int(aggression)
+        edgeguard = int(edgeguard)
+        anticipation = int(anticipation)
+        defensiveness = int(defensiveness)
+        with open(bin_location, "rb") as fp:
+            dump = AmiiboDump(self.master_keys, fp.read())
+        dump.unlock()
+        dump.data[0x1BC:0x1BE] = aggression.to_bytes(2, "little")
+        dump.data[0x1BE:0x1C0] = edgeguard.to_bytes(2, "little")
+        dump.data[0x1C0:0x1C2] = anticipation.to_bytes(2, "little")
+        dump.data[0x1C2:0x1C4] = defensiveness.to_bytes(2, "little")
+        dump.lock()
+        with open(saveAs_location, "wb") as fp:
+            fp.write(dump.data)
+
     def transplant(self, bin_location, character, saveAs_location, randomize_SN=False):
         """
         Takes a bin and replaces it's character ID with given character's ID
@@ -445,7 +562,7 @@ class BinManager:
         """
 
         dump = self.__open_bin(bin_location)
-
+        mii_transplant = hex('B3E038270F1D4C92ABCEF5427D67F9DCEC30CE3000000000000000000000000000000000000000000040400000000000001F02000208040304020C1302040306020C010409171304030D080000040A0008040A0004021400')
         if dump is None:
             return None
 
@@ -463,6 +580,7 @@ class BinManager:
             Opening {} has failed.
             Hit any button to close the program.'''.format(bin))
             exit()
+        dump.data[0x148:0x1A0] = mii_transplant
         dump.data[84:92] = bytes.fromhex(hex_tag)
         dump.lock()
         with open(saveAs_location, 'wb') as fp:
@@ -491,7 +609,7 @@ class BinManager:
         receiver_dump.data[520:533] = donor_dump.data[520:533]
         receiver_dump.lock()
 
-        with open(saveAs_location, 'wb') as fp:
+        with open(saveAs_location, "wb") as fp:
             fp.write(receiver_dump.data)
 
         return True
