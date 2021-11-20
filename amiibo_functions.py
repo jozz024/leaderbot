@@ -3,6 +3,7 @@ from ssbu_amiibo import SsbuAmiiboDump as AmiiboDump
 import random
 from dictionaries import *
 
+
 class BinManager:
     def __init__(self, char_dict, key_directory="Brain_Transplant_Assets"):
         """
@@ -90,7 +91,16 @@ class BinManager:
             with open(bin_location, "wb") as fp:
                 fp.write(dump.data)
 
-    def setspirits(self, bin_location, attack, defense, ability1, ability2, ability3, saveAs_location):
+    def setspirits(
+        self,
+        bin_location,
+        attack,
+        defense,
+        ability1,
+        ability2,
+        ability3,
+        saveAs_location,
+    ):
         try:
             ability1 = SPIRITSKILLTABLE[ability1.lower()]
         except KeyError:
@@ -109,11 +119,15 @@ class BinManager:
         hexability2 = int(SPIRITSKILLS[ability2.lower()])
         hexability3 = int(SPIRITSKILLS[ability3.lower()])
         maxstats = 5000
-        with open(bin_location, 'rb') as fp:
-            dump = AmiiboDump(self.master_keys, fp.read())
+
+        dump = self.__open_bin(bin_location)
         dump.unlock()
-        
-        slotsfilled = SKILLSLOTS[ability1.lower()] + SKILLSLOTS[ability2.lower()] +  SKILLSLOTS[ability3.lower()]
+
+        slotsfilled = (
+            SKILLSLOTS[ability1.lower()]
+            + SKILLSLOTS[ability2.lower()]
+            + SKILLSLOTS[ability3.lower()]
+        )
         if slotsfilled == 1:
             maxstats = maxstats - 300
         if slotsfilled == 2:
@@ -123,17 +137,17 @@ class BinManager:
         print(hexatk + hexdef)
         print(maxstats)
         if hexatk + hexdef <= maxstats:
-            dump.data[0x1A4:0x1A6] = hexatk.to_bytes(2, 'little')
-            dump.data[0x1A6:0x1A8] = hexdef.to_bytes(2, 'little')
-            dump.data[0x140:0x141] = hexability1.to_bytes(1, 'little')
-            dump.data[0x141:0x142] = hexability2.to_bytes(1, 'little')
-            dump.data[0x142:0x143] = hexability3.to_bytes(1, 'little')
+            dump.data[0x1A4:0x1A6] = hexatk.to_bytes(2, "little")
+            dump.data[0x1A6:0x1A8] = hexdef.to_bytes(2, "little")
+            dump.data[0x140:0x141] = hexability1.to_bytes(1, "little")
+            dump.data[0x141:0x142] = hexability2.to_bytes(1, "little")
+            dump.data[0x142:0x143] = hexability3.to_bytes(1, "little")
             dump.lock()
-            with open(saveAs_location, 'wb') as fp:
+            with open(saveAs_location, "wb") as fp:
                 fp.write(dump.data)
-        else: 
+        else:
             dump.lock()
-            raise IndexError('Illegal Bin')
+            raise IndexError("Illegal Bin")
 
     def dump_to_amiitools(self, dump):
         """Convert a standard Amiibo/NTAG215 dump to the 3DS/amiitools internal
@@ -193,28 +207,44 @@ class BinManager:
         """
 
         dump = self.__open_bin(bin_location)
-        mii_transplant = hex('B3E038270F1D4C92ABCEF5427D67F9DCEC30CE3000000000000000000000000000000000000000000040400000000000001F02000208040304020C1302040306020C010409171304030D080000040A0008040A0004021400')
+        mii_transplant = "B3E038270F1D4C92ABCEF5427D67F9DCEC30CE3000000000000000000000000000000000000000000040400000000000001F02000208040304020C1302040306020C010409171304030D080000040A0008040A0004021400"
         if dump is None:
             return None
 
         if randomize_SN:
             self.randomize_sn(dump)
         hex_tag = self.characters[character]
-        hex_tag = hex_tag[0] + hex_tag[1] + ' ' + hex_tag[2] + hex_tag[3] + ' ' + hex_tag[4] + hex_tag[5] + ' ' + \
-                  hex_tag[6] + hex_tag[7] + ' ' + hex_tag[8] + hex_tag[9] + ' ' + hex_tag[10] + hex_tag[11] + ' ' + \
-                  hex_tag[12] + hex_tag[13] + ' ' + hex_tag[14] + hex_tag[15]
+        hex_tag = (
+            hex_tag[0]
+            + hex_tag[1]
+            + " "
+            + hex_tag[2]
+            + hex_tag[3]
+            + " "
+            + hex_tag[4]
+            + hex_tag[5]
+            + " "
+            + hex_tag[6]
+            + hex_tag[7]
+            + " "
+            + hex_tag[8]
+            + hex_tag[9]
+            + " "
+            + hex_tag[10]
+            + hex_tag[11]
+            + " "
+            + hex_tag[12]
+            + hex_tag[13]
+            + " "
+            + hex_tag[14]
+            + hex_tag[15]
+        )
 
-        try:
-            dump.unlock()
-        except:
-            input('''
-            Opening {} has failed.
-            Hit any button to close the program.'''.format(bin))
-            exit()
-        dump.data[0x148:0x1A0] = mii_transplant
+        dump.unlock()
+        dump.data[0x148:0x1A0] = bytes.fromhex(mii_transplant)
         dump.data[84:92] = bytes.fromhex(hex_tag)
         dump.lock()
-        with open(saveAs_location, 'wb') as fp:
+        with open(saveAs_location, "wb") as fp:
             fp.write(dump.data)
         return character
 

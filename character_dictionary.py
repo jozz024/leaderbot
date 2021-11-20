@@ -106,7 +106,7 @@ class CharacterDictionary:
         for key in self.dict:
             node = xml.Element("Character")
             root.append(node)
-            node.attrib = {'enabled': self.dict[key][1]}
+            node.attrib = {"enabled": self.dict[key][1]}
 
             c_child = xml.SubElement(node, "Name")
             c_child.text = key
@@ -127,5 +127,7 @@ class CharacterDictionary:
         """
         output = []
         for key in self.dict:
-            output.append("{}, {}, enabled={}".format(key, self.dict[key][0], self.dict[key][1]))
+            output.append(
+                "{}, {}, enabled={}".format(key, self.dict[key][0], self.dict[key][1])
+            )
         return output
