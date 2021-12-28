@@ -32,7 +32,6 @@ for amiibo in characterlink.json()["data"]:
     amiibogames.insert(7, amiibo["rating_mu"])
     amiibogames.insert(8, amiibo["rating_sigma"])
     amiibos.append(amiibogames)
-print(f'{characterlink.json()["data"]}')
 amiibos.insert(
     0,
     [

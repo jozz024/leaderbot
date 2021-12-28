@@ -1,6 +1,8 @@
 from nextcord.ext import commands
-import nextcord
+import os
+from nextcord import slash_command
 from dictionaries import *
+from nextcord import Interaction, SlashOption
 import requests
 
 
@@ -55,11 +57,15 @@ class amiibotsCog(commands.Cog):
             output = "No 30+ game amiibo for this character"
         return output
 
-    @commands.command(
+    @slash_command(
         name="bestamiibo",
         description="Gives you the name and rating of the best amiibo in both vanilla and spirits",
     )
-    async def getfirstnfp(self, ctx, ruleset):
+    async def getfirstnfp(
+        self,
+        interaction: Interaction, 
+        ruleset = SlashOption(name="ruleset", description = "Ruleset you want the data for."),
+    ):
         try:
             rulesetid = RULSET_NAME_TO_ID_MAPPING[ruleset.lower()]
         except KeyError:
@@ -67,37 +73,56 @@ class amiibotsCog(commands.Cog):
                 ruleset = TRANSLATION_TABLE_RULESET[ruleset.lower().replace(" ", "")]
                 rulesetid = RULSET_NAME_TO_ID_MAPPING[ruleset]
             except KeyError:
-                ctx.send("Invalid ruleset.")
+                await interaction.response.send_message("Invalid ruleset.", ephemeral=True)
         characterlink = requests.get(
             f"https://www.amiibots.com/api/amiibo?per_page=10&ruleset_id={rulesetid}"
         )
         firstnfprating = characterlink.json()["data"][0]["rating"]
         firstnfpname = characterlink.json()["data"][0]["name"]
-        await ctx.send(
-            f"The highest rated {ruleset} amiibo is: \n 1.) {firstnfpname} [{round(firstnfprating, 2)}]"
+        await interaction.response.send_message(
+            f"The highest rated {ruleset} amiibo is: \n 1.) {firstnfpname} [{round(firstnfprating, 2)}]", 
+            ephemeral=True
         )
 
-    @commands.command(
+    @slash_command(
         name="topoverall",
         description="Gives you the top 10 overall amiibo in both vanilla and spirits.",
     )
-    async def gettopthreenfp(self, ctx, ruleset):
-        await ctx.send(self.char("highest", ruleset, "overall"))
+    async def gettopthreenfp(
+        self,
+        interaction: Interaction, 
+        ruleset = SlashOption(name="ruleset", description = "Ruleset you want the data for."),
+    ):
+        await interaction.response.send_message(self.char("highest", ruleset, "overall"), ephemeral=True)
 
-    @commands.command(
+    @slash_command(
         name="botoverall",
-        description="Gives you the top 10 overall amiibo in both vanilla and spirits.",
+        description="Gives you the bottom 10 overall amiibo in both vanilla and spirits.",
     )
-    async def getbotthreenfp(self, ctx, ruleset):
-        await ctx.send(self.char("lowest", ruleset, "overall"))
+    async def getbotthreenfp(
+        self,
+        interaction: Interaction, 
+        ruleset = SlashOption(name="ruleset", description = "Ruleset you want the data for."),
+    ):
+        await interaction.response.send_message(self.char("lowest", ruleset, "overall"), ephemeral=True)
 
-    @commands.command(name="topchar")
-    async def gettopthreenfpcharacter(self, ctx, ruleset, *, character_name):
-        await ctx.send(self.char("highest", ruleset, character_name))
+    @slash_command(name="topchar")
+    async def gettopthreenfpcharacter(
+        self,
+        interaction: Interaction, 
+        character = SlashOption(name="character", description = "Character Name you want the data for."),
+        ruleset = SlashOption(name="ruleset", description = "Ruleset you want the data for."),
+    ):
+        await interaction.response.send_message(self.char("highest", ruleset, character), ephemeral=True)
 
-    @commands.command(name="botchar")
-    async def getbotthreenfpcharacter(self, ctx, ruleset, *, character_name):
-        await ctx.send(self.char("lowest", ruleset, character_name))
+    @slash_command(name="botchar")
+    async def getbotthreenfpcharacter(
+        self,
+        interaction: Interaction, 
+        character = SlashOption(name="character", description = "Character Name you want the data for."),
+        ruleset = SlashOption(name="ruleset", description = "Ruleset you want the data for."),
+):
+        await interaction.response.send_message(self.char("lowest", ruleset, character), ephemeral=True)
 
 
 def setup(bot):

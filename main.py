@@ -6,7 +6,7 @@ from nextcord import File
 from dictionaries import *
 import os
 
-token = os.environ["token"]
+token = os.environ["leaderbot.canary"]
 bot = commands.Bot(command_prefix="!", description="deez")
 
 
