@@ -152,7 +152,7 @@ class amiibotsCog(commands.Cog):
         self,
         interaction: Interaction, 
         character = SlashOption(name="character", description = "Character Name you want the data for."),
-        ruleset = SlashOption(name="ruleset", choices={'vanilla':'vanilla','spirits':'spirits'}, description = "Ruleset you want the data for."),
+        ruleset = SlashOption(name="ruleset", choices={'vanilla':'vanilla','spirits':'spirits'}, description = "Ruleset you want data for."),
     ):
         await interaction.send('Please wait while the data is being gathered for you.', ephemeral=True)
         await interaction.edit_original_message(content = self.char("highest", ruleset, character))
