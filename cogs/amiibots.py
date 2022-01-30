@@ -206,9 +206,9 @@ class amiibotsCog(commands.Cog):
             if amiibo["is_active"] == True:
                 amiiboactive = amiiboactive + 1
         if character != None:
-            await interaction.edit_original_message(content = f"There are currently {amiiboactive} {character_name.title()} amiibo active in {ruleset}")
+            await interaction.edit_original_message(content = f"There are currently {amiiboactive} {character_name.title()} amiibo active in {ruleset}.")
         else: 
-            await interaction.edit_original_message(content = f"There are currently {amiiboactive} amiibo active in {ruleset}")
+            await interaction.edit_original_message(content = f"There are currently {amiiboactive} amiibo active in {ruleset}.")
     @commands.is_owner()
     @commands.command()
     async def pull(self, ctx: Context, auto=False):
