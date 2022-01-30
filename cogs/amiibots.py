@@ -182,7 +182,6 @@ class amiibotsCog(commands.Cog):
                     self.bot.unload_extension(cog_name)
                     self.bot.load_extension(cog_name)
                     await ctx.send(f":white_check_mark: `{cog}` successfully reloaded.")
-                    await self.cog_load_actions(cog)
                 except:
                     await ctx.send(
                         f":x: Cog reloading failed, traceback: "
