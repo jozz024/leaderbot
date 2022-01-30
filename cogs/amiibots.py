@@ -1,3 +1,5 @@
+import difflib
+import re
 from nextcord.ext import commands
 import os
 from nextcord import slash_command
@@ -9,7 +11,10 @@ import requests
 class amiibotsCog(commands.Cog):
     def char(self, topbot, ruleset, character_name):
         try:
-            character = CHARACTER_NAME_TO_ID_MAPPING[character_name.lower()]
+            if character_name == 'overall':
+                character = None
+            else:
+                character = CHARACTER_NAME_TO_ID_MAPPING[character_name.lower()]
         except KeyError:
             try:
                 character_name = TRANSLATION_TABLE_CHARACTER[
@@ -26,7 +31,7 @@ class amiibotsCog(commands.Cog):
                 rulesetid = RULSET_NAME_TO_ID_MAPPING[ruleset]
             except KeyError:
                 return f"'{ruleset}' is an invalid ruleset."
-        if character_name.lower() == "overall":
+        if character == None:
             characterlink = list(
                 requests.get(
                     f"https://www.amiibots.com/api/amiibo?per_page=99999&ruleset_id={rulesetid}"
@@ -43,12 +48,12 @@ class amiibotsCog(commands.Cog):
                 f"The {topbot} rated {ruleset.title()} {character_name.title()} are:```"
             )
         if topbot == "lowest":
-            characterlink.reverse()
+            characterlink = list(reversed(characterlink))
         printed_amiibo_count = 0
         for amiibo in characterlink:
             if amiibo["total_matches"] >= 30 and amiibo["is_banned"] == False:
                 printed_amiibo_count += 1
-                amiibo_win_percent = float(amiibo["win_percentage"]) * 100
+                
                 output += f"\n{printed_amiibo_count:>2}.) {amiibo['name']:^10} | {round(amiibo['rating'], 2):0^5} | {int(amiibo['wins'])}-{int(amiibo['losses'])}"
             if printed_amiibo_count >= 10:
                 break
@@ -64,7 +69,7 @@ class amiibotsCog(commands.Cog):
     async def getfirstnfp(
         self,
         interaction: Interaction, 
-        ruleset = SlashOption(name="ruleset", description = "Ruleset you want the data for."),
+        ruleset = SlashOption(name="ruleset", choices={'vanilla':'vanilla','spirits':'spirits'}, description = "Ruleset you want the data for."),
     ):
         try:
             rulesetid = RULSET_NAME_TO_ID_MAPPING[ruleset.lower()]
@@ -85,45 +90,60 @@ class amiibotsCog(commands.Cog):
         )
 
     @slash_command(
-        name="topoverall",
-        description="Gives you the top 10 overall amiibo in both vanilla and spirits.",
+        name="topoverall"
     )
     async def gettopthreenfp(
         self,
         interaction: Interaction, 
-        ruleset = SlashOption(name="ruleset", description = "Ruleset you want the data for."),
+        ruleset = SlashOption(name="ruleset",choices={'vanilla':'vanilla','spirits':'spirits'}, description = "Ruleset you want the data for."),
     ):
-        await interaction.response.send_message(self.char("highest", ruleset, "overall"), ephemeral=True)
+        await interaction.send('Please wait while the data is being gathered for you.', ephemeral=True)
+        await interaction.edit_original_message(content = self.char("highest", ruleset, "overall"))
 
     @slash_command(
-        name="botoverall",
-        description="Gives you the bottom 10 overall amiibo in both vanilla and spirits.",
+        name="botoverall"
     )
     async def getbotthreenfp(
         self,
         interaction: Interaction, 
-        ruleset = SlashOption(name="ruleset", description = "Ruleset you want the data for."),
+        ruleset = SlashOption(name="ruleset", choices={'vanilla':'vanilla','spirits':'spirits'}, description = "Ruleset you want the data for."),
     ):
-        await interaction.response.send_message(self.char("lowest", ruleset, "overall"), ephemeral=True)
+        await interaction.send('Please wait while the data is being gathered for you.', ephemeral=True)
+        await interaction.edit_original_message(content = self.char("lowest", ruleset, "overall"))
 
     @slash_command(name="topchar")
     async def gettopthreenfpcharacter(
         self,
         interaction: Interaction, 
         character = SlashOption(name="character", description = "Character Name you want the data for."),
-        ruleset = SlashOption(name="ruleset", description = "Ruleset you want the data for."),
+        ruleset = SlashOption(name="ruleset", choices={'vanilla':'vanilla','spirits':'spirits'}, description = "Ruleset you want the data for."),
     ):
-        await interaction.response.send_message(self.char("highest", ruleset, character), ephemeral=True)
+        await interaction.send('Please wait while the data is being gathered for you.', ephemeral=True)
+        await interaction.edit_original_message(content = self.char("highest", ruleset, character))
 
     @slash_command(name="botchar")
     async def getbotthreenfpcharacter(
         self,
         interaction: Interaction, 
         character = SlashOption(name="character", description = "Character Name you want the data for."),
-        ruleset = SlashOption(name="ruleset", description = "Ruleset you want the data for."),
+        ruleset = SlashOption(name="ruleset", choices={'vanilla':'vanilla','spirits':'spirits'}, description = "Ruleset you want the data for."),
 ):
-        await interaction.response.send_message(self.char("lowest", ruleset, character), ephemeral=True)
+        await interaction.send('Please wait while the data is being gathered for you.', ephemeral=True)
+        await interaction.edit_original_message(content = self.char("lowest", ruleset, character))
 
+    @gettopthreenfpcharacter.on_autocomplete("character")
+    async def autocompletechar(self, interaction: Interaction, character):
+        test = difflib.get_close_matches(character, CHARACTERS, 10, 0.3)
+        if character == test[0]:
+            test = [character]
+        await interaction.response.send_autocomplete(test)
+
+    @getbotthreenfpcharacter.on_autocomplete("character")
+    async def autocompletechar(self, interaction: Interaction, character):
+        test = difflib.get_close_matches(character, CHARACTERS, 10, 0.3)
+        if character == test[0]:
+            test = [character]
+        await interaction.response.send_autocomplete(test)
 
 def setup(bot):
     bot.add_cog(amiibotsCog(bot))
