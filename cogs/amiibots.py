@@ -167,6 +167,48 @@ class amiibotsCog(commands.Cog):
         await interaction.send('Please wait while the data is being gathered for you.', ephemeral=True)
         await interaction.edit_original_message(content = self.char("lowest", ruleset, character))
 
+    @slash_command(name="active")
+    async def activechar( 
+        self,
+        interaction: Interaction, 
+        character_name = SlashOption(name="character", description = "Character Name you want the data for."),
+        ruleset = SlashOption(name="ruleset", choices={'vanilla':'vanilla','spirits':'spirits'}, description = "Ruleset you want the data for."),
+    ):
+        await interaction.send('Please wait while the data is being gathered for you.', ephemeral=True)
+        try:
+            if character_name == 'overall':
+                character = None
+            else:
+                character = CHARACTER_NAME_TO_ID_MAPPING[character_name.lower()]
+        except KeyError:
+            try:
+                character_name = TRANSLATION_TABLE_CHARACTER[
+                    character_name.lower().replace(" ", "")
+                ]
+                character = CHARACTER_NAME_TO_ID_MAPPING[character_name]
+            except KeyError:
+                await interaction.send(f"'{character_name}' is an invalid character.", ephemeral=True)
+        rulesetid = RULSET_NAME_TO_ID_MAPPING[ruleset.lower()]
+        if character == None:
+            characterlink = list(
+                requests.get(
+                    f"https://www.amiibots.com/api/amiibo?per_page=99999&ruleset_id={rulesetid}"
+                ).json()["data"]
+            )
+        else:
+            characterlink = list(
+                    requests.get(
+                        f"https://www.amiibots.com/api/amiibo?per_page=99999&ruleset_id={rulesetid}&playable_character_id={character}"
+                    ).json()["data"]
+            )
+        amiiboactive = 0
+        for amiibo in characterlink:
+            if amiibo["is_active"] == True:
+                amiiboactive = amiiboactive + 1
+        if character != None:
+            await interaction.edit_original_message(content = f"There are currently {amiiboactive} {character_name.title()} amiibo active in {ruleset}")
+        else: 
+            await interaction.edit_original_message(content = f"There are currently {amiiboactive} amiibo active in {ruleset}")
     @commands.is_owner()
     @commands.command()
     async def pull(self, ctx: Context, auto=False):
@@ -191,15 +233,31 @@ class amiibotsCog(commands.Cog):
     @gettopthreenfpcharacter.on_autocomplete("character")
     async def autocompletechar(self, interaction: Interaction, character):
         test = difflib.get_close_matches(character, CHARACTERS, 10, 0.3)
-        if character == test[0]:
-            test = [character]
+        try:
+            if character == test[0]:
+              test = [character]
+        except IndexError:
+            pass
         await interaction.response.send_autocomplete(test)
 
     @getbotthreenfpcharacter.on_autocomplete("character")
     async def autocompletechar(self, interaction: Interaction, character):
         test = difflib.get_close_matches(character, CHARACTERS, 10, 0.3)
-        if character == test[0]:
-            test = [character]
+        try:
+            if character == test[0]:
+              test = [character]
+        except IndexError:
+            pass
+        await interaction.response.send_autocomplete(test)
+
+    @activechar.on_autocomplete("character_name")
+    async def autocompletechar(self, interaction: Interaction, character):
+        test = difflib.get_close_matches(character, CHARACTERS, 10, 0.3)
+        try:
+            if character == test[0]:
+              test = [character]
+        except IndexError:
+            pass
         await interaction.response.send_autocomplete(test)
 
 def setup(bot):
