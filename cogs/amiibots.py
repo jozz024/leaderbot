@@ -223,6 +223,7 @@ class amiibotsCog(commands.Cog):
                 try:
                     self.bot.unload_extension(cog_name)
                     self.bot.load_extension(cog_name)
+                    self.bot.deploy_application_commands()
                     await ctx.send(f":white_check_mark: `{cog}` successfully reloaded.")
                 except:
                     await ctx.send(
