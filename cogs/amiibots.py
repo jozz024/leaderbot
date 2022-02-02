@@ -90,7 +90,7 @@ class amiibotsCog(commands.Cog):
         elif character == None and topbot == 'lowest':
             characterlink = list(
                 requests.get(
-                    f"https://www.amiibots.com/api/amiibo?per_page=99999&ruleset_id={rulesetid}"
+                    f"https://www.amiibots.com/api/amiibo?cursor=7&per_page=15&ruleset_id={rulesetid}"
                 ).json()["data"]
             )
             output = f"The {topbot} rated {ruleset.title()} amiibo are:```"
