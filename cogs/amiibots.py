@@ -3,19 +3,32 @@ import difflib
 import asyncio
 import re
 from nextcord.ext import commands
-import os
 import traceback
 from nextcord import slash_command
 from dictionaries import *
 from nextcord import Interaction, SlashOption
 import requests
+import json
+import os
+import sys
 
-
+skillsheet = requests.get(f"https://www.amiibots.com/api/spirit_skill").json()['data']
+with open('spirits.json', 'w+') as skill:
+    skill.write(json.dumps(skillsheet))
 class amiibotsCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.bot.async_call_shell = self.async_call_shell
 
+    def restart_bot(self): 
+        os.execv(sys.executable, ['py'] + sys.argv)
+
+    def getskills(self, skill_id):
+         with open('spirits.json', 'r') as skill:
+            skillss = json.load(skill)
+            for skills in skillss:
+                if skills['id'] == skill_id:
+                    return skills['name']
     async def async_call_shell(
         self, shell_command: str, inc_stdout=True, inc_stderr=True
     ):
@@ -89,15 +102,27 @@ class amiibotsCog(commands.Cog):
         for amiibo in characterlink:
             if amiibo["total_matches"] >= 30 and amiibo["is_banned"] == False:
                 printed_amiibo_count += 1
-                
-                output += f"\n{printed_amiibo_count:>2}.) {amiibo['name']:^10} | {round(amiibo['rating'], 2):0^5} | {int(amiibo['wins'])}-{int(amiibo['losses'])}"
+                if amiibo['ruleset_id'] == '328d8932-456f-4219-9fa4-c4bafdb55776':
+                    output += f"\n{printed_amiibo_count:>2}.) {amiibo['name']:^10} | {amiibo['attack_stat']}/{amiibo['defense_stat']} | {round(amiibo['rating'], 2):0^5} | {int(amiibo['wins'])}-{int(amiibo['losses'])}"
+                    for spirits in amiibo['spirit_skill_ids']:
+                        output += f"\n    -{self.getskills(spirits)}"
+                    output += '\n-----------------------------'
+                else:
+                    output += f"\n{printed_amiibo_count:>2}.) {amiibo['name']:^10} | {round(amiibo['rating'], 2):0^5} | {int(amiibo['wins'])}-{int(amiibo['losses'])}"
+
             if printed_amiibo_count >= 10:
                 break
+        output = output.strip('\n-----------------------------')
         output += "```"
         if printed_amiibo_count == 0:
             output = "No 30+ game amiibo for this character"
         return output
 
+    @commands.is_owner()
+    @commands.command(name = 'restart')
+    async def restart(self, ctx):
+        self.restart_bot()
+        
     @slash_command(
         name="bestamiibo",
         description="Gives you the name and rating of the best amiibo in both vanilla and spirits",

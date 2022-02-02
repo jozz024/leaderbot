@@ -420,6 +420,7 @@ SPIRITSKILLS = {
     "mouthfulofcurryupup": 234,
     "finalsmashup": 235,
     "criticalhealing&metal": 236,
+    "weaponattack&movespeedup": 238
 }
 
 SKILLSLOTS = {
