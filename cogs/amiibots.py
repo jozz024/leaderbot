@@ -80,7 +80,14 @@ class amiibotsCog(commands.Cog):
                 rulesetid = RULSET_NAME_TO_ID_MAPPING[ruleset]
             except KeyError:
                 return f"'{ruleset}' is an invalid ruleset."
-        if character == None:
+        if character == None and topbot == 'highest':
+            characterlink = list(
+                requests.get(
+                    f"https://www.amiibots.com/api/amiibo?per_page=15&ruleset_id={rulesetid}"
+                ).json()["data"]
+            )
+            output = f"The {topbot} rated {ruleset.title()} amiibo are:```"
+        elif character == None and topbot == 'lowest':
             characterlink = list(
                 requests.get(
                     f"https://www.amiibots.com/api/amiibo?per_page=99999&ruleset_id={rulesetid}"
@@ -122,7 +129,7 @@ class amiibotsCog(commands.Cog):
     @commands.command(name = 'restart')
     async def restart(self, ctx):
         self.restart_bot()
-        
+
     @slash_command(
         name="bestamiibo",
         description="Gives you the name and rating of the best amiibo in both vanilla and spirits",
