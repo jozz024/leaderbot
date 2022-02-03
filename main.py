@@ -1,9 +1,6 @@
 import nextcord
 import asyncio
 from nextcord.ext import commands
-import re
-from nextcord import File
-from dictionaries import *
 import os
 
 token = os.environ["leaderbot.canary"]
