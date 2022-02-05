@@ -7,3 +7,4 @@ owo.py
 *.csv
 slashtest.py
 spirits.json
+cogs/util/
