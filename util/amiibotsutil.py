@@ -104,21 +104,23 @@ class utilities():
             return f"There are currently {amiiboactive} amiibo active in {ruleset}."
             
     def getUserById(self, user_id):
-        user_not_in_cache_or_outdated = user_id not in self.user_dict or date.today().strftime("%Y-%m-%d") != self.user_dict[user_id][1]
+        iso_time_str = datetime.datetime.fromisoformat(self.user_dict[user_id][1])
+        user_not_in_cache_or_outdated = user_id not in self.user_dict or (datetime.datetime.now() - iso_time_str) >= datetime.timedelta(hours=24)
         if user_not_in_cache_or_outdated:
             userinfo = requests.get(f'https://amiibots/api/user/by_user_id/{user_id}').json()
-            self.user_dict[user_id] = [userinfo, date.today()]
+            self.user_dict[user_id] = [userinfo, datetime.datetime.now().isoformat()]
         else:
             userinfo = self.user_dict[user_id]
         return userinfo
 
     async def getusername(self, user_id, bot):
-        user_not_in_cache_or_outdated = user_id not in self.user_dict or date.today().strftime("%Y-%m-%d") != self.user_dict[user_id][1]
+        iso_time_str = datetime.datetime.fromisoformat(self.user_dict[user_id][1])
+        user_not_in_cache_or_outdated = user_id not in self.user_dict or (datetime.datetime.now() - iso_time_str) >= datetime.timedelta(hours=24)
         if not user_not_in_cache_or_outdated:
             userinfo = self.user_dict[user_id]
         else:
         #    userinfo = requests.get(f'https://amiibots/api/user/by_user_id/{user_id}').json()
-        #    self.user_dict[user_id] = [userinfo, date.today()]
+        #    self.user_dict[user_id] = [userinfo, datetime.datetime.now().isoformat()]
             userinfo = self.user_dict[user_id]
 
         if userinfo[0]['discord_id'] != None:
