@@ -1,28 +1,30 @@
 import difflib
 from datetime import date
 
-import requests
+import aiohttp
 import util.amiibotsutil
 from dictionaries import CHARACTERS
 from nextcord import Interaction, SlashOption, slash_command
 from nextcord.ext import commands
 
-amiibotsutil = util.amiibotsutil.utilities()
+
 class amiibotsCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.amiibotsutil = util.amiibotsutil.utilities(bot)
+
     async def char(self, topbot, ruleset, character):
-        character_id = amiibotsutil.validatechar(character)
-        ruleset_id = amiibotsutil.getruleset(ruleset)
-        url = amiibotsutil.geturl(topbot, character_id, ruleset_id)
+        character_id = self.amiibotsutil.validatechar(character)
+        ruleset_id = self.amiibotsutil.getruleset(ruleset)
+        url = self.amiibotsutil.geturl(topbot, character_id, ruleset_id)
         if character == "overall":
             output = f"The {topbot} rated {ruleset.title()} amiibo are:```"
         else:
             output = f"The {topbot} rated {ruleset.title()} {character.title()} are:```"
-        characterlink = list(requests.get(url).json()["data"])
+        characterlink = await self.amiibotsutil.get_amiibots_response(url)
         if topbot == "lowest":
             characterlink = list(reversed(characterlink))
-        output = await amiibotsutil.getoutput(characterlink, output, self.bot)
+        output = await self.amiibotsutil.getoutput(characterlink, output)
         return output
 
     @slash_command(name="topoverall")
@@ -55,7 +57,7 @@ class amiibotsCog(commands.Cog):
         await interaction.send(
             "Please wait while the data is being gathered for you.", ephemeral=True
         )
-        
+
         await interaction.edit_original_message(
             content=await self.char("lowest", ruleset, "overall")
         )
@@ -117,7 +119,7 @@ class amiibotsCog(commands.Cog):
             "Please wait while the data is being gathered for you.", ephemeral=True
         )
         await interaction.edit_original_message(
-            content=amiibotsutil.getactiveamiibo(character_name, ruleset)
+            content=await self.amiibotsutil.getactiveamiibo(character_name, ruleset)
         )
 
     @gettopthreenfpcharacter.on_autocomplete("character")
