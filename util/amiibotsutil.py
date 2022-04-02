@@ -27,7 +27,7 @@ class utilities():
         if topbot == 'highest' and char_id == 'None':
             url = base_url + '?per_page=15&ruleset_id=' + ruleset_id
         elif topbot == 'lowest' and char_id == 'None':
-            url = base_url + '?cursor=7&per_page=15&ruleset_id=' + ruleset_id
+            url = base_url + '?cursor=8&per_page=100&ruleset_id=' + ruleset_id
         elif topbot == 'highest' and char_id != 'None':
             url = base_url + '?per_page=30&ruleset_id=' + ruleset_id + '&playable_character_id=' + char_id
         elif topbot == 'lowest' and char_id != 'None':
@@ -46,23 +46,26 @@ class utilities():
     async def getoutput(self, characterlink, output):
         printed_amiibo_count = 0
         for amiibo in characterlink:
-            if amiibo["total_matches"] >= 30:
-                printed_amiibo_count += 1
+            if amiibo["user"]["is_banned"] is False and amiibo["is_banned"] is False:
+                if amiibo["total_matches"] >= 30:
+                    printed_amiibo_count += 1
 
-                if amiibo['ruleset_id'] == '328d8932-456f-4219-9fa4-c4bafdb55776':
-                    output += f"\n{printed_amiibo_count:>2}.) {amiibo['name']:^10} | {amiibo['attack_stat']}/{amiibo['defense_stat']} | {round(amiibo['rating'], 2):0^5} | {int(amiibo['wins'])}-{int(amiibo['losses'])}"
+                    if amiibo['ruleset_id'] == '328d8932-456f-4219-9fa4-c4bafdb55776':
+                        output += f"\n{printed_amiibo_count:>2}.) {amiibo['name']:^10} | {amiibo['attack_stat']}/{amiibo['defense_stat']} | {round(amiibo['rating'], 2):0^5} | {int(amiibo['wins'])}-{int(amiibo['losses'])}"
 
-                    output += f"\n  Trainer: {await self.getusername(amiibo['user'])}"
+                        output += f"\n  Trainer: {await self.getusername(amiibo['user'])}"
 
-                    for spirits in amiibo['spirit_skill_ids']:
-                        output += f"\n    -{self.getskills(spirits)}"
-                    output += '\n-----------------------------'
-                else:
-                    output += f"\n{printed_amiibo_count:>2}.) {amiibo['name']:^10} | {round(amiibo['rating'], 2):0^5} | {int(amiibo['wins'])}-{int(amiibo['losses'])}"
-                    output += f"\n  Trainer: {await self.getusername(amiibo['user'])}"
-                    output += '\n-----------------------------'
-            if printed_amiibo_count >= 10:
-                break
+                        for spirits in amiibo['spirit_skill_ids']:
+                            output += f"\n    -{self.getskills(spirits)}"
+                        output += '\n-----------------------------'
+                    else:
+                        output += f"\n{printed_amiibo_count:>2}.) {amiibo['name']:^10} | {round(amiibo['rating'], 2):0^5} | {int(amiibo['wins'])}-{int(amiibo['losses'])}"
+                        output += f"\n  Trainer: {await self.getusername(amiibo['user'])}"
+                        output += '\n-----------------------------'
+                if printed_amiibo_count >= 10:
+                    break
+            else:
+                continue
         output = output.strip('\n-----------------------------')
         output += "```"
         if printed_amiibo_count == 0:
