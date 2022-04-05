@@ -47,11 +47,12 @@ class utilities():
         printed_amiibo_count = 0
         for amiibo in characterlink:
             if amiibo["user"]["is_banned"] is False and amiibo["is_banned"] is False:
+                amiibo["name"] = await self.sanitize_text_for_discord(amiibo['name'])
                 if amiibo["total_matches"] >= 30:
                     printed_amiibo_count += 1
 
                     if amiibo['ruleset_id'] == '328d8932-456f-4219-9fa4-c4bafdb55776':
-                        output += f"\n{printed_amiibo_count:>2}.) {self.sanitize_text_for_discord(amiibo['name']):^10} | {amiibo['attack_stat']}/{amiibo['defense_stat']} | {round(amiibo['rating'], 2):0^5} | {int(amiibo['wins'])}-{int(amiibo['losses'])}"
+                        output += f"\n{printed_amiibo_count:>2}.) {amiibo['name']:^10} | {amiibo['attack_stat']}/{amiibo['defense_stat']} | {round(amiibo['rating'], 2):0^5} | {int(amiibo['wins'])}-{int(amiibo['losses'])}"
 
                         output += f"\n  Trainer: {await self.getusername(amiibo['user'])}"
 
@@ -59,7 +60,7 @@ class utilities():
                             output += f"\n    -{self.getskills(spirits)}"
                         output += '\n-----------------------------'
                     else:
-                        output += f"\n{printed_amiibo_count:>2}.) {self.sanitize_text_for_discord(amiibo['name']):^10} | {round(amiibo['rating'], 2):0^5} | {int(amiibo['wins'])}-{int(amiibo['losses'])}"
+                        output += f"\n{printed_amiibo_count:>2}.) {amiibo['name']:^10} | {round(amiibo['rating'], 2):0^5} | {int(amiibo['wins'])}-{int(amiibo['losses'])}"
                         output += f"\n  Trainer: {await self.getusername(amiibo['user'])}"
                         output += '\n-----------------------------'
                 if printed_amiibo_count >= 10:
