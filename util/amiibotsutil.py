@@ -51,7 +51,7 @@ class utilities():
                 if amiibo["total_matches"] >= 30:
                     printed_amiibo_count += 1
 
-                    if amiibo['ruleset_id'] == '328d8932-456f-4219-9fa4-c4bafdb55776':
+                    if amiibo['ruleset_id'] == RULSET_NAME_TO_ID_MAPPING["spirits"]:
                         output += f"\n{printed_amiibo_count:>2}.) {amiibo['name']:^10} | {amiibo['attack_stat']}/{amiibo['defense_stat']} | {round(amiibo['rating'], 2):0^5} | {int(amiibo['wins'])}-{int(amiibo['losses'])}"
 
                         output += f"\n  Trainer: {await self.getusername(amiibo['user'])}"
