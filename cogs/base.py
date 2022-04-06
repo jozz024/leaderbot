@@ -11,8 +11,8 @@ class BaseCog(commands.Cog):
         self.bot = bot
         self.bot.async_call_shell = self.async_call_shell
 
-    def restart_bot(self): 
-        os.execv(sys.executable, ['py'] + sys.argv)
+    async def restart_bot(self):
+        await self.bot.async_call_shell("sudo systemctl restart leaderbot")
 
     async def async_call_shell(
         self, shell_command: str, inc_stdout=True, inc_stderr=True
@@ -46,7 +46,7 @@ class BaseCog(commands.Cog):
     @commands.is_owner()
     @commands.command(name = 'restart')
     async def restart(self, ctx):
-        self.restart_bot()
+        await self.restart_bot()
 
     @commands.is_owner()
     @commands.command()
