@@ -1,8 +1,9 @@
 
 RULSET_NAME_TO_ID_MAPPING = {
     "vanilla": "44748ebb-e2f3-4157-90ec-029e26087ad0",
-#    "spirits": "328d8932-456f-4219-9fa4-c4bafdb55776",
-    "spirits": "af1df0cd-3251-4b44-ba04-d48de5b73f8b",
+    "spirits":  "328d8932-456f-4219-9fa4-c4bafdb55776",
+    "spirits: big 5 ban": "328d8932-456f-4219-9fa4-c4bafdb55776",
+    "spirits: anything goes": "af1df0cd-3251-4b44-ba04-d48de5b73f8b",
 }
 CHARACTERS = [
     "mario",
