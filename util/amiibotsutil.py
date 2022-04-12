@@ -12,6 +12,7 @@ class MyEmbedFieldPageSource(menus.ListPageSource):
     async def format_page(self, menu, entries):
         embed = Embed(title=entries[6])
         embed.set_image(url = entries[5])
+        embed.set_author(name = entries[4])
         res = any(map(lambda ele: ele is None, entries))
         if res == False:
             spirit_list = []
@@ -54,7 +55,7 @@ class utilities():
         if topbot == 'highest' and char_id == 'None':
             url = base_url + '?per_page=15&ruleset_id=' + ruleset_id
         elif topbot == 'lowest' and char_id == 'None':
-            url = base_url + '?cursor=8&per_page=100&ruleset_id=' + ruleset_id
+            url = base_url + '?cursor=9&per_page=100&ruleset_id=' + ruleset_id
         elif topbot == 'highest' and char_id != 'None':
             url = base_url + '?per_page=30&ruleset_id=' + ruleset_id + '&playable_character_id=' + char_id
         elif topbot == 'lowest' and char_id != 'None':
@@ -70,13 +71,13 @@ class utilities():
             async with session.get(url) as resp:
                 return list((await resp.json())["data"])
 
-    async def getoutput(self, characterlink, output, legacy):
+    async def getoutput(self, characterlink, output, detailed):
         printed_amiibo_count = 0
         data = []
         for amiibo in characterlink:
             if amiibo["user"]["is_banned"] is False and amiibo["is_banned"] is False:
                 amiibo["name"] = await self.sanitize_text_for_discord(amiibo['name'])
-                if legacy == "False":
+                if detailed == "True":
                         if amiibo["total_matches"] >= 30:
                             printed_amiibo_count += 1
                             image, character = await self.grab_img_and_char(amiibo["character_metadata"])
@@ -86,6 +87,7 @@ class utilities():
                                 data.append((amiibo["name"], round(amiibo["rating"], 2), int(amiibo["wins"]), int(amiibo["losses"]), await self.getusername(amiibo['user']), image, character, None, None, None, round(amiibo["rating_mu"],2)))
                 else:
                     if amiibo["total_matches"] >= 30:
+                        printed_amiibo_count += 1
                         if amiibo['ruleset_id'] == RULSET_NAME_TO_ID_MAPPING["spirits"]:
                             output += f"\n{printed_amiibo_count:>2}.) {amiibo['name']:^10} | {amiibo['attack_stat']}/{amiibo['defense_stat']} | {round(amiibo['rating'], 2):0^5} | {int(amiibo['wins'])}-{int(amiibo['losses'])}"
 
@@ -98,14 +100,13 @@ class utilities():
                             output += f"\n{printed_amiibo_count:>2}.) {amiibo['name']:^10} | {round(amiibo['rating'], 2):0^5} | {int(amiibo['wins'])}-{int(amiibo['losses'])}"
                             output += f"\n  Trainer: {await self.getusername(amiibo['user'])}"
                             output += '\n-----------------------------'
-                        printed_amiibo_count += 1
                 if printed_amiibo_count >= 10:
                     break
             else:
                 continue
         if printed_amiibo_count == 0:
             output = "No 30+ game amiibo for this character"
-        if legacy == "False":
+        if detailed == "True":
             pages = menus.ButtonMenuPages(
                 source=MyEmbedFieldPageSource(data),
                 clear_buttons_after=True,

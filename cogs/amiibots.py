@@ -33,27 +33,27 @@ class amiibotsCog(commands.Cog):
             choices={"vanilla": "vanilla", "spirits: big 5 ban": "spirits: big 5 ban", "spirits: anything goes": "spirits: anything goes"},
             description="Ruleset you want data for.",
         ),
-        legacy=SlashOption(
-            name="legacy", description="use legacy amiibo listing?", default = "False", choices={"True": "True", "False": "False"}, required=False
+        detailed=SlashOption(
+            name="detailed", description="use detailed amiibo listing?", default = "False", choices={"True": "True", "False": "False"}, required=False
         ),
     ):
         await interaction.send(
             "Please wait while the data is being gathered for you.", ephemeral=True
         )
 
-        if legacy == "False":
+        if detailed == "False":
+            await interaction.edit_original_message(
+                content=await self.char("highest", ruleset, "overall", detailed)
+                )
+        else:
             try:
-                pages = await self.char("highest", ruleset, "overall", legacy)
+                pages = await self.char("highest", ruleset, "overall", detailed)
 
                 await pages.start(interaction=interaction, ephemeral = True)
             except AttributeError:
                 await interaction.edit_original_message(
-                content= "The new menus currently do not work in DMs, apologies.\n" + await self.char("highest", ruleset, "overall", "True")
+                content= "The new menus currently do not work in DMs, apologies.\n\n" + await self.char("highest", ruleset, "overall", "False")
                 )
-        else:
-            await interaction.edit_original_message(
-                content=await self.char("highest", ruleset, "overall", legacy)
-            )
 
     @slash_command(name="botoverall")
     async def getbotthreenfp(
@@ -64,27 +64,27 @@ class amiibotsCog(commands.Cog):
             choices={"vanilla": "vanilla", "spirits: big 5 ban": "spirits: big 5 ban", "spirits: anything goes": "spirits: anything goes"},
             description="Ruleset you want data for.",
         ),
-        legacy=SlashOption(
-            name="legacy", description="use legacy amiibo listing?", default = "False", choices={"True": "True", "False": "False"}, required=False
+        detailed=SlashOption(
+            name="detailed", description="use detailed amiibo listing?", default = "False", choices={"True": "True", "False": "False"}, required=False
         ),
     ):
         await interaction.send(
             "Please wait while the data is being gathered for you.", ephemeral=True
         )
 
-        if legacy == "False":
+        if detailed == "False":
+            await interaction.edit_original_message(
+                content=await self.char("lowest", ruleset, "overall", detailed)
+                )
+        else:
             try:
-                pages = await self.char("lowest", ruleset, "overall", legacy)
+                pages = await self.char("lowest", ruleset, "overall", detailed)
 
                 await pages.start(interaction=interaction, ephemeral = True)
             except AttributeError:
                 await interaction.edit_original_message(
-                content= "The new menus currently do not work in DMs, apologies.\n" + await self.char("lowest", ruleset, "overall", "True")
+                content= "The new menus currently do not work in DMs, apologies.\n\n" + await self.char("lowest", ruleset, "overall", "False")
                 )
-        else:
-            await interaction.edit_original_message(
-                content=await self.char("lowest", ruleset, "overall", legacy)
-            )
 
     @slash_command(name="topchar")
     async def gettopthreenfpcharacter(
@@ -98,27 +98,27 @@ class amiibotsCog(commands.Cog):
             choices={"vanilla": "vanilla", "spirits: big 5 ban": "spirits: big 5 ban", "spirits: anything goes": "spirits: anything goes"},
             description="Ruleset you want data for.",
         ),
-        legacy=SlashOption(
-            name="legacy", description="use legacy amiibo listing?", default = "False", choices={"True": "True", "False": "False"}, required=False
+        detailed=SlashOption(
+            name="detailed", description="use detailed amiibo listing?", default = "False", choices={"True": "True", "False": "False"}, required=False
         ),
     ):
         await interaction.send(
             "Please wait while the data is being gathered for you.", ephemeral=True
         )
-        if legacy == "False":
+
+        if detailed == "False":
+            await interaction.edit_original_message(
+                content=await self.char("highest", ruleset, character, detailed)
+                )
+        else:
             try:
-                pages = await self.char("highest", ruleset, character, legacy)
+                pages = await self.char("highest", ruleset, character, detailed)
 
                 await pages.start(interaction=interaction, ephemeral = True)
             except AttributeError:
                 await interaction.edit_original_message(
-                content= "The new menus currently do not work in DMs, apologies.\n" + await self.char("highest", ruleset, character, "True")
+                content= "The new menus currently do not work in DMs, apologies.\n\n" + await self.char("highest", ruleset, character, "False")
                 )
-        else:
-            await interaction.edit_original_message(
-                content=await self.char("highest", ruleset, character, legacy)
-            )
-
     @slash_command(name="botchar")
     async def getbotthreenfpcharacter(
         self,
@@ -131,26 +131,27 @@ class amiibotsCog(commands.Cog):
             choices={"vanilla": "vanilla", "spirits: big 5 ban": "spirits: big 5 ban", "spirits: anything goes": "spirits: anything goes"},
             description="Ruleset you want data for.",
         ),
-        legacy=SlashOption(
-            name="legacy", description="use legacy amiibo listing?", default = "False", choices={"True": "True", "False": "False"}, required=False
+        detailed=SlashOption(
+            name="detailed", description="use detailed amiibo listing?", default = "False", choices={"True": "True", "False": "False"}, required=False
         ),
     ):
         await interaction.send(
             "Please wait while the data is being gathered for you.", ephemeral=True
         )
-        if legacy == "False":
+
+        if detailed == "False":
+            await interaction.edit_original_message(
+                content=await self.char("lowest", ruleset, character, detailed)
+                )
+        else:
             try:
-                pages = await self.char("lowest", ruleset, character, legacy)
+                pages = await self.char("lowest", ruleset, character, detailed)
 
                 await pages.start(interaction=interaction, ephemeral = True)
             except AttributeError:
                 await interaction.edit_original_message(
-                content= "The new menus currently do not work in DMs, apologies.\n" + await self.char("lowest", ruleset, character, "True")
+                content= "The new menus currently do not work in DMs, apologies.\n\n" + await self.char("lowest", ruleset, character, "False")
                 )
-        else:
-            await interaction.edit_original_message(
-                content=await self.char("lowest", ruleset, character, legacy)
-            )
 
     @slash_command(name="active")
     async def activechar(
