@@ -9,6 +9,7 @@ import os
 token = os.environ["leaderbot.canary"]
 bot = commands.Bot(command_prefix="!", description="deez")
 
+os.chdir(os.path.dirname(os.path.realpath(__file__)))
 
 @bot.event
 async def on_ready():
