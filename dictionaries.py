@@ -86,6 +86,7 @@ CHARACTERS = [
     "simon",
     "mewtwo",
     "banjo & kazooie",
+    "min min",
     "overall",
 ]
 
@@ -170,6 +171,7 @@ CHARACTER_NAME_TO_ID_MAPPING = {
     "simon": "fa1ac3ba-0880-483b-b94e-9b4952e3f999",
     "mewtwo": "fd264bc3-a141-400f-9e55-adabc783322d",
     "banjo & kazooie": "fe995f08-d261-47ba-ac69-81bbd272f8ce",
+    "min min": "e8962383-ad1a-49ea-ab7a-2c2bf6aabfc1",
     "overall": "dn",
 }
 
@@ -217,6 +219,8 @@ TRANSLATION_TABLE_CHARACTER = {
     "tink": "toon link",
     "banjo": "banjo & kazooie",
     "banjoandkazooie": "banjo & kazooie",
+    "min": "min min",
+    "minmin": "min min"
 }
 
 TRANSLATION_TABLE_CHARACTER_TRANSPLANT = {
@@ -262,6 +266,8 @@ TRANSLATION_TABLE_CHARACTER_TRANSPLANT = {
     "tink": "toon link",
     "banjo": "banjo & kazooie",
     "banjoandkazooie": "banjo & kazooie",
+    "min": "min min",
+    "minmin": "min min"
 }
 
 TRANSLATION_TABLE_RULESET = {"v": "vanilla", "s": "spirits", "spirit": "spirits"}
