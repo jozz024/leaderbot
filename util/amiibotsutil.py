@@ -3,6 +3,7 @@ import json
 import aiohttp
 from nextcord import Embed
 from nextcord.ext import menus
+
 base_url = 'https://www.amiibots.com/api/amiibo'
 
 class MyEmbedFieldPageSource(menus.ListPageSource):
@@ -52,6 +53,7 @@ class utilities():
         return ruleset
 
     def geturl(self, topbot, char_id, ruleset_id):
+        # bad impl, but it has to stay until someone implements reverse sorting for the api
         if topbot == 'highest' and char_id == 'None':
             url = base_url + '?per_page=15&ruleset_id=' + ruleset_id
         elif topbot == 'lowest' and char_id == 'None':
@@ -67,43 +69,53 @@ class utilities():
         return url
 
     async def get_amiibots_response(self, url):
+        # asyncly get the amiibots data
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as resp:
                 return list((await resp.json())["data"])
 
-    async def getoutput(self, characterlink, output, detailed):
+    async def getoutput(self, amiibo_dict, output, detailed):
         printed_amiibo_count = 0
+        # initializes the list of amiibo
         data = []
-        for amiibo in characterlink:
+        # iterates through the dict of amiibo passed in
+        for amiibo in amiibo_dict:
+            # check if the amiibo is banned or if the user is banned
             if amiibo["user"]["is_banned"] is False and amiibo["is_banned"] is False:
+                # sanitizes the name
                 amiibo["name"] = await self.sanitize_text_for_discord(amiibo['name'])
+                # check if detailed is true
                 if detailed == "True":
+                        # only do stuff if the amiibo's matches are greater than 30
                         if amiibo["total_matches"] >= 30:
+                            # increase the number keeping track of the amount of amiibo added to the list
                             printed_amiibo_count += 1
+                            # grab the character name and image from amiiboapi
                             image, character = await self.grab_img_and_char(amiibo["character_metadata"])
+                            # check if ruleset is spirits and apply some spirits specific data if so
                             if amiibo["ruleset_id"] == RULSET_NAME_TO_ID_MAPPING["spirits: big 5 ban"] or amiibo["ruleset_id"] == RULSET_NAME_TO_ID_MAPPING["spirits: anything goes"]:
                                 data.append((amiibo["name"], round(amiibo["rating"], 2), int(amiibo["wins"]), int(amiibo["losses"]), await self.getusername(amiibo['user']), image, character, amiibo['spirit_skill_ids'], amiibo["attack_stat"], amiibo["defense_stat"], round(amiibo["rating_mu"],2)))
+                            # otherwise, leave all of those values none
                             else:
                                 data.append((amiibo["name"], round(amiibo["rating"], 2), int(amiibo["wins"]), int(amiibo["losses"]), await self.getusername(amiibo['user']), image, character, None, None, None, round(amiibo["rating_mu"],2)))
+                # for if detailed is false
                 else:
+                    # check if the amiibo's total matches are above 30
                     if amiibo["total_matches"] >= 30:
+                        # increase the number that keeps track of the amount of times we've iterated
                         printed_amiibo_count += 1
-                        if amiibo['ruleset_id'] == RULSET_NAME_TO_ID_MAPPING["spirits"]:
-                            output += f"\n{printed_amiibo_count:>2}.) {amiibo['name']:^10} | {amiibo['attack_stat']}/{amiibo['defense_stat']} | {round(amiibo['rating'], 2):0^5} | {int(amiibo['wins'])}-{int(amiibo['losses'])}"
-
-                            output += f"\n  Trainer: {await self.getusername(amiibo['user'])}"
-
-                            for spirits in amiibo['spirit_skill_ids']:
-                                output += f"\n    -{self.getskills(spirits)}"
-                            output += '\n-----------------------------'
-                        else:
-                            output += f"\n{printed_amiibo_count:>2}.) {amiibo['name']:^10} | {round(amiibo['rating'], 2):0^5} | {int(amiibo['wins'])}-{int(amiibo['losses'])}"
-                            output += f"\n  Trainer: {await self.getusername(amiibo['user'])}"
-                            output += '\n-----------------------------'
+                        # gen output
+                        output += f"\n{printed_amiibo_count:>2}.) {amiibo['name']:^10} | {round(amiibo['rating'], 2):0^5} | {int(amiibo['wins'])}-{int(amiibo['losses'])}"
+                        # add user
+                        output += f"\n  Trainer: {await self.getusername(amiibo['user'])}"
+                        # line of -- for easy reading
+                        output += '\n-----------------------------'
+                # break the loop if the amount of amiibo iterated through is 10
                 if printed_amiibo_count >= 10:
                     break
             else:
                 continue
+        # make output a warning message if no 30 game amiibo exist
         if printed_amiibo_count == 0:
             output = "No 30+ game amiibo for this character"
         if detailed == "True":
@@ -113,25 +125,33 @@ class utilities():
             )
             return pages
         else:
+            # strip the line of -- since its the last line
             output = output.strip('\n-----------------------------')
             output += "```"
             return output
 
     def getskills(self, skill_id):
          with open('spirits.json', 'r') as skill:
+            # load the skills and return the skill name if it matches the id
             skillss = json.load(skill)
             for skills in skillss:
                 if skills['id'] == skill_id:
                     return skills['name']
 
     async def getactiveamiibo(self, character, ruleset):
+        # get character id after validating the character
         character_id = self.validatechar(character)
+        # get the ruleset from the ruleset string
         ruleset_id = self.getruleset(ruleset)
+        # get the url
         url = self.geturl('active', character_id, ruleset_id)
-        characterlink = await self.get_amiibots_response(url)
+        # get the amiibo dict from the url
+        amiibo_dict = await self.get_amiibots_response(url)
+        # the counter for how many of the amiibo are active (standby or active)
         amiiboactive = 0
-        for amiibo in characterlink:
-            if amiibo["is_active"] == True:
+        # iterate over the dict for the active amiibo
+        for amiibo in amiibo_dict:
+            if amiibo["match_selection_status"] != "INACTIVE":
                 amiiboactive = amiiboactive + 1
         if character != None:
             return f"There are currently {amiiboactive} {character.title()} amiibo active in {ruleset}."
@@ -154,5 +174,4 @@ class utilities():
     async def grab_img_and_char(self, id):
         async with aiohttp.ClientSession() as session:
             async with session.get(f"https://amiiboapi.com/api/amiibo/?id={id}") as resp:
-                # print((await resp.json())["amiibo"])
                 return (await resp.json())["amiibo"]["image"], (await resp.json())["amiibo"]["character"]

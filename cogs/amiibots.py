@@ -8,20 +8,27 @@ from nextcord.ext import commands
 class amiibotsCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        # initialize it on cog load because we need the bot variable
         self.amiibotsutil = util.amiibotsutil.utilities(bot)
 
-    async def char(self, topbot, ruleset, character, legacy):
+    async def char(self, topbot: str, ruleset: str, character: str, detailed: str):
+        # get character id from the str
         character_id = self.amiibotsutil.validatechar(character)
+        # get ruleset id from the str
         ruleset_id = self.amiibotsutil.getruleset(ruleset)
+        # get url from character id, ruleset id, and top or bottom
         url = self.amiibotsutil.geturl(topbot, character_id, ruleset_id)
+        # if character is overall, dont add character to the message
         if character == "overall":
             output = f"The {topbot} rated {ruleset.title()} amiibo are:```"
+        # else, replace `amiibo` with the character
         else:
             output = f"The {topbot} rated {ruleset.title()} {character.title()} are:```"
-        characterlink = await self.amiibotsutil.get_amiibots_response(url)
+
+        amiibo_dict = await self.amiibotsutil.get_amiibots_response(url)
         if topbot == "lowest":
-            characterlink = list(reversed(characterlink))
-        output = await self.amiibotsutil.getoutput(characterlink, output, legacy)
+            amiibo_dict = list(reversed(amiibo_dict))
+        output = await self.amiibotsutil.getoutput(amiibo_dict, output, detailed)
         return output
 
     @slash_command(name="topoverall")
